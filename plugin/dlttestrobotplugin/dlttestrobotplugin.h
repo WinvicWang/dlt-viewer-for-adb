@@ -108,8 +108,8 @@ private:
 
     unsigned int port;
 
-    QStringList filterEcuId;
-    QStringList filterAppId;
+    QStringList filtertag;
+    QStringList filterProcId;
     QStringList filterCtxId;
 
 };

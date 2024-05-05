@@ -70,7 +70,7 @@ private:
 
 
 private slots:
-    void on_groupBoxAppId_clicked(bool checked);
+    void on_groupBoxProcId_clicked(bool checked);
     void on_groupBoxConId_clicked(bool checked);
     void on_groupBoxAutomaticTimeSettings_clicked(bool checked);
     void on_tooButtonPluginsPath_clicked();

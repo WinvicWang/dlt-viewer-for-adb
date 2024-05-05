@@ -180,7 +180,7 @@
 /**
  * The size of a DLT ID
  */
-#define DLT_ID_SIZE 4
+#define DLT_ID_SIZE 40
 
 #define DLT_SIZE_WEID DLT_ID_SIZE
 #define DLT_SIZE_WSID (sizeof(uint32_t))
@@ -291,9 +291,9 @@
 #define DLT_HEADER_SHOW_TIME       0x0001
 #define DLT_HEADER_SHOW_TMSTP      0x0002
 #define DLT_HEADER_SHOW_MSGCNT     0x0004
-#define DLT_HEADER_SHOW_ECUID      0x0008
-#define DLT_HEADER_SHOW_APID       0x0010
-#define DLT_HEADER_SHOW_CTID       0x0020
+#define DLT_HEADER_SHOW_TAG      0x0008
+#define DLT_HEADER_SHOW_PID       0x0010
+#define DLT_HEADER_SHOW_TID       0x0020
 #define DLT_HEADER_SHOW_MSGTYPE    0x0040
 #define DLT_HEADER_SHOW_MSGSUBTYPE 0x0080
 #define DLT_HEADER_SHOW_VNVSTATUS  0x0100
@@ -318,7 +318,7 @@ QDLT_C_EXPORT extern char dltSerialHeaderChar[DLT_ID_SIZE];
 
 /**
 
- * The type of a DLT ID (context id, application id, etc.)
+ * The type of a DLT ID (thread id, process id, etc.)
  */
 typedef char ID4[DLT_ID_SIZE];
 
@@ -330,7 +330,7 @@ typedef struct
     char pattern[DLT_ID_SIZE];		/**< This pattern should be DLT0x01 */
     uint32_t seconds;			    /**< seconds since 1.1.1970 */
     int32_t microseconds;			/**< Microseconds */
-    char ecu[DLT_ID_SIZE];			/**< The ECU id is added, if it is not already in the DLT message itself */
+    char ecu[DLT_ID_SIZE];			/**< The Tag is added, if it is not already in the DLT message itself */
 } PACKED DltStorageHeader;
 
 /**
@@ -348,7 +348,7 @@ typedef struct
  */
 typedef struct
 {
-    char ecu[DLT_ID_SIZE];       /**< ECU id */
+    char ecu[DLT_ID_SIZE];       /**< Tag */
     uint32_t seid;     /**< Session number */
     uint32_t tmsp;     /**< Timestamp since system start in 0.1 milliseconds */
 } PACKED DltStandardHeaderExtra;
@@ -360,8 +360,8 @@ typedef struct
 {
     uint8_t msin;          /**< messsage info */
     uint8_t noar;          /**< number of arguments */
-    char apid[DLT_ID_SIZE];          /**< application id */
-    char ctid[DLT_ID_SIZE];          /**< context id */
+    char pid[DLT_ID_SIZE];          /**< process id */
+    char tid[DLT_ID_SIZE];          /**< thread id */
 } PACKED DltExtendedHeader;
 
 /**
@@ -399,8 +399,8 @@ typedef struct
 {
     uint32_t service_id;            /**< service ID */
     uint8_t options;                /**< type of request */
-    char apid[DLT_ID_SIZE];                   /**< application id */
-    char ctid[DLT_ID_SIZE];                   /**< context id */
+    char pid[DLT_ID_SIZE];                   /**< process id */
+    char tid[DLT_ID_SIZE];                   /**< thread id */
     char com[DLT_ID_SIZE];                    /**< communication interface */
 } PACKED DltServiceGetLogInfoRequest;
 
@@ -410,8 +410,8 @@ typedef struct
 typedef struct
 {
     uint32_t service_id;            /**< service ID */
-    char apid[DLT_ID_SIZE];                   /**< application id */
-    char ctid[DLT_ID_SIZE];                   /**< context id */
+    char pid[DLT_ID_SIZE];                   /**< process id */
+    char tid[DLT_ID_SIZE];                   /**< thread id */
     uint8_t log_level;              /**< log level to be set */
     char com[DLT_ID_SIZE];                    /**< communication interface */
 } PACKED DltServiceSetLogLevel;
@@ -495,8 +495,8 @@ typedef struct
 {
     uint32_t service_id;            /**< service ID */
     uint8_t status;                 /**< reponse status */
-    char apid[DLT_ID_SIZE];         /**< application id */
-    char ctid[DLT_ID_SIZE];         /**< context id */
+    char pid[DLT_ID_SIZE];         /**< process id */
+    char tid[DLT_ID_SIZE];         /**< thread id */
     char comid[DLT_ID_SIZE];        /**< communication interface */
 } PACKED DltServiceUnregisterContext;
 
@@ -538,8 +538,8 @@ typedef struct
  */
 typedef struct
 {
-    char apid[DLT_FILTER_MAX][DLT_ID_SIZE]; /**< application id */
-    char ctid[DLT_FILTER_MAX][DLT_ID_SIZE]; /**< context id */
+    char pid[DLT_FILTER_MAX][DLT_ID_SIZE]; /**< process id */
+    char tid[DLT_FILTER_MAX][DLT_ID_SIZE]; /**< thread id */
     int  counter;                           /**< number of filters */
 } DltFilter;
 
@@ -692,30 +692,30 @@ extern "C"
     /**
      * Find index of filter in filter list
      * @param filter pointer to structure of organising DLT filter
-     * @param apid application id to be found in filter list
-     * @param ctid context id to be found in filter list
+     * @param pid process id to be found in filter list
+     * @param tid thread id to be found in filter list
      * @param verbose if set to true verbose information is printed out.
      * @return negative value if there was an error (or not found), else return index of filter
      */
-    QDLT_C_EXPORT int dlt_filter_find(DltFilter *filter,const char *apid,const char *ctid, int verbose);
+    QDLT_C_EXPORT int dlt_filter_find(DltFilter *filter,const char *pid,const char *tid, int verbose);
     /**
      * Add new filter to filter list.
      * @param filter pointer to structure of organising DLT filter
-     * @param apid application id to be added to filter list (must always be set).
-     * @param ctid context id to be added to filter list. empty equals don't care.
+     * @param pid process id to be added to filter list (must always be set).
+     * @param tid thread id to be added to filter list. empty equals don't care.
      * @param verbose if set to true verbose information is printed out.
      * @return negative value if there was an error
      */
-    QDLT_C_EXPORT int dlt_filter_add(DltFilter *filter,const char *apid,const char *ctid,int verbose);
+    QDLT_C_EXPORT int dlt_filter_add(DltFilter *filter,const char *pid,const char *tid,int verbose);
     /**
      * Delete filter from filter list
      * @param filter pointer to structure of organising DLT filter
-     * @param apid application id to be deleted from filter list
-     * @param ctid context id to be deleted from filter list
+     * @param pid process id to be deleted from filter list
+     * @param tid thread id to be deleted from filter list
      * @param verbose if set to true verbose information is printed out.
      * @return negative value if there was an error
      */
-    QDLT_C_EXPORT int dlt_filter_delete(DltFilter *filter,const char *apid,const char *ctid,int verbose);
+    QDLT_C_EXPORT int dlt_filter_delete(DltFilter *filter,const char *pid,const char *tid,int verbose);
 
     /**
      * Initialise the structure used to access a DLT message.

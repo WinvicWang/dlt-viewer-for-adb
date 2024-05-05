@@ -41,7 +41,7 @@
      <property name="title">
       <string>Advanced</string>
      </property>
-     <widget class="QLineEdit" name="apIdlineEdit">
+     <widget class="QLineEdit" name="pidlineEdit">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -51,10 +51,10 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only messages of the given ApId are considered by the search &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only messages of the given Pid are considered by the search &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="whatsThis">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the ApId to search text only for this ApId&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the Pid to search text only for this Pid&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_6">
@@ -67,7 +67,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>ApId:</string>
+       <string>Pid:</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_7">
@@ -80,10 +80,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>CtId:</string>
+       <string>Tid:</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="ctIdlineEdit">
+     <widget class="QLineEdit" name="tidlineEdit">
       <property name="geometry">
        <rect>
         <x>340</x>
@@ -93,10 +93,10 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only messages of the given CtId are considered by the search &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only messages of the given Tid are considered by the search &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="whatsThis">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the CtId to search text only for this CtId&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the Tid to search text only for this Tid&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="timeStartlineEdit">

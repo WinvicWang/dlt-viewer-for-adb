@@ -37,6 +37,7 @@
 #include <QDateTime>
 #include <QSerialPort>
 #include <QPluginLoader>
+#include <QProcess>
 
 #if defined(_MSC_VER)
 #include <cstdint>
@@ -67,10 +68,11 @@ class EcuItem  : public QTreeWidgetItem
 {
 public:
     enum {
+        INTERFACETYPE_ADB,
         INTERFACETYPE_TCP,
         INTERFACETYPE_UDP,
         INTERFACETYPE_SERIAL_DLT,
-        INTERFACETYPE_SERIAL_ASCII
+        INTERFACETYPE_SERIAL_ASCII,
     };
 
     EcuItem(QTreeWidgetItem *parent = 0);
@@ -82,6 +84,7 @@ public:
     QString id;
     QString default_id = "ECU";
     QString description;
+    QString adbId;
     int interfacetype;
     int loglevel;
     int tracestatus;
@@ -100,6 +103,7 @@ public:
     QTcpSocket tcpsocket;
     QUdpSocket udpsocket;
     QAbstractSocket * socket;
+    QProcess process;
 
     QSerialPort *m_serialport;
 

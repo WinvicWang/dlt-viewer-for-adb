@@ -326,14 +326,14 @@ bool NonverbosePlugin::parseFile(QString filename)
               {
                   if(frame)
                   {
-                      frame->appid = xml.readElementText();
+                      frame->procid = xml.readElementText();
                   }
               }
               if(xml.name() == QString("CONTEXT_ID"))
               {
                   if(frame)
                   {
-                      frame->ctid = xml.readElementText();
+                      frame->tid = xml.readElementText();
                   }
               }
               if(xml.name() == QString("PDU-INSTANCE"))
@@ -378,9 +378,9 @@ bool NonverbosePlugin::parseFile(QString filename)
                   {
                       if (framemap.contains(frame->id))
                       {
-                            if( framemapwithkey.contains(DltFibexKey(frame->id,frame->appid,frame->ctid)))
+                            if( framemapwithkey.contains(DltFibexKey(frame->id,frame->procid,frame->tid)))
                             {
-                                // do not add frame, if Id, appid and ctid already exist
+                                // do not add frame, if Id, procid and tid already exist
                                 // show warning instead
                                 warning_text+=frame->id + ", ";
                                 delete frame;
@@ -388,12 +388,12 @@ bool NonverbosePlugin::parseFile(QString filename)
                             }
                             else
                             {
-                                framemapwithkey[DltFibexKey(frame->id,frame->appid,frame->ctid)] = frame;
+                                framemapwithkey[DltFibexKey(frame->id,frame->procid,frame->tid)] = frame;
                             }
                       }
                       else
                       {
-                            framemapwithkey[DltFibexKey(frame->id,frame->appid,frame->ctid)] = frame;
+                            framemapwithkey[DltFibexKey(frame->id,frame->procid,frame->tid)] = frame;
                             framemap[frame->id] = frame;
                       }
                       frame = 0;
@@ -472,7 +472,7 @@ QStringList NonverbosePlugin::infoConfig()
     foreach(DltFibexFrame *frame, framemapwithkey)
     {
         QString text;
-        text += frame->id + QString(" AppI:%1 CtI:%2 Len:%3 MT:%4 MI:%5").arg(frame->appid).arg(frame->ctid).arg(frame->byteLength).arg(frame->messageType).arg(frame->messageInfo);
+        text += frame->id + QString(" AppI:%1 CtI:%2 Len:%3 MT:%4 MI:%5").arg(frame->procid).arg(frame->tid).arg(frame->byteLength).arg(frame->messageType).arg(frame->messageInfo);
         int c = 0;
         foreach(DltFibexPduRef *ref, frame->pdureflist)
         {
@@ -508,9 +508,9 @@ bool NonverbosePlugin::isMsg(QDltMsg &msg, int triggeredByUser)
 
     QString idtext = QString("ID_%1").arg(msg.getMessageId());
 
-    if(!msg.getApid().isEmpty() && !msg.getCtid().isEmpty())
-        // search in full key, if msg already contains AppId and CtId
-        return framemapwithkey.contains(DltFibexKey(idtext,msg.getApid(),msg.getCtid()));
+    if(!msg.getPid().isEmpty() && !msg.getTid().isEmpty())
+        // search in full key, if msg already contains ProcId and Tid
+        return framemapwithkey.contains(DltFibexKey(idtext,msg.getPid(),msg.getTid()));
     else
         // search only for id
         return framemap.contains(idtext);
@@ -534,10 +534,10 @@ bool NonverbosePlugin::decodeMsg(QDltMsg &msg, int triggeredByUser)
 
     QString idtext = QString("ID_%1").arg(msg.getMessageId());
     DltFibexFrame *frame;
-    if(!msg.getApid().isEmpty() && !msg.getCtid().isEmpty())
+    if(!msg.getPid().isEmpty() && !msg.getTid().isEmpty())
     {
-        // search in full key, if msg already contains AppId and CtId
-        frame = framemapwithkey[DltFibexKey(idtext,msg.getApid(),msg.getCtid())];
+        // search in full key, if msg already contains ProcId and Tid
+        frame = framemapwithkey[DltFibexKey(idtext,msg.getPid(),msg.getTid())];
     }
     else
     {
@@ -549,13 +549,13 @@ bool NonverbosePlugin::decodeMsg(QDltMsg &msg, int triggeredByUser)
 
     /* set message data */
 
-    // set ApId only if it is empty
-    if(msg.getApid().isEmpty())
-        msg.setApid(frame->appid);
+    // set Pid only if it is empty
+    if(msg.getPid().isEmpty())
+        msg.setPid(frame->procid);
 
-    // set Context Id only if it is empty
-    if(msg.getCtid().isEmpty())
-        msg.setCtid(frame->ctid);
+    // set Thread Id only if it is empty
+    if(msg.getTid().isEmpty())
+        msg.setTid(frame->tid);
 
     msg.setNumberOfArguments(frame->pdureflist.size());
     msg.setType((QDltMsg::DltTypeDef)(frame->messageType));

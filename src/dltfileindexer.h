@@ -223,13 +223,13 @@ signals:
     void progressText(QString text);
 
     // version log message parsed
-    void versionString(QString ecuId, QString version);
+    void versionString(QString tag, QString version);
 
     // control message timezone parsed
     void timezone(int timezone, unsigned char dst);
 
     // control message unregister context
-    void unregisterContext(QString ecuId,QString appId,QString ctId);
+    void unregisterContext(QString tag,QString procId,QString tid);
 
     // index creation finished
     void finishIndex();

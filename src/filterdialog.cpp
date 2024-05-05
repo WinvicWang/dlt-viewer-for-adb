@@ -91,14 +91,14 @@ QString FilterDialog::getName()
     return ui->lineEditName->text();
 }
 
-void FilterDialog::setEnableRegexp_Appid(bool state)
+void FilterDialog::setEnableRegexp_Procid(bool state)
 {
-    ui->checkBoxRegexp_Appid->setChecked(state);
+    ui->checkBoxRegexp_Procid->setChecked(state);
 }
 
-bool FilterDialog::getEnableRegexp_Appid()
+bool FilterDialog::getEnableRegexp_Procid()
 {
-    return (ui->checkBoxRegexp_Appid->checkState() == Qt::Checked);
+    return (ui->checkBoxRegexp_Procid->checkState() == Qt::Checked);
 }
 
 void FilterDialog::setEnableRegexp_Context(bool state)
@@ -151,64 +151,64 @@ bool FilterDialog::getIgnoreCase_Payload()
     return (ui->checkBox_IgnoreCase_Payload->checkState() == Qt::Checked);
 }
 
-void FilterDialog::setEcuId(QString id)
+void FilterDialog::settag(QString id)
 {
-    ui->lineEditEcuId->setText(id);
+    ui->lineEdittag->setText(id);
 }
 
-QString FilterDialog::getEcuId()
+QString FilterDialog::gettag()
 {
-    return ui->lineEditEcuId->text();
+    return ui->lineEdittag->text();
 }
 
-void FilterDialog::setEnableEcuId(bool state)
+void FilterDialog::setEnabletag(bool state)
 {
-    ui->checkBoxEcuId->setCheckState(state?Qt::Checked:Qt::Unchecked);
+    ui->checkBoxtag->setCheckState(state?Qt::Checked:Qt::Unchecked);
 }
 
-bool FilterDialog::getEnableEcuId()
+bool FilterDialog::getEnabletag()
 {
-    return (ui->checkBoxEcuId->checkState() == Qt::Checked);
+    return (ui->checkBoxtag->checkState() == Qt::Checked);
 }
 
-void FilterDialog::setApplicationId(QString id)
+void FilterDialog::setProcessId(QString id)
 {
-    ui->lineEditApplicationId->setText(id);
+    ui->lineEditProcessId->setText(id);
 }
 
-QString FilterDialog::getApplicationId()
+QString FilterDialog::getProcessId()
 {
-    return ui->lineEditApplicationId->text();
+    return ui->lineEditProcessId->text();
 }
 
-void FilterDialog::setEnableApplicationId(bool state)
+void FilterDialog::setEnableProcessId(bool state)
 {
-    ui->checkBoxApplicationId->setCheckState(state?Qt::Checked:Qt::Unchecked);
+    ui->checkBoxProcessId->setCheckState(state?Qt::Checked:Qt::Unchecked);
 }
 
-bool FilterDialog::getEnableApplicationId()
+bool FilterDialog::getEnableProcessId()
 {
-    return (ui->checkBoxApplicationId->checkState() == Qt::Checked);
+    return (ui->checkBoxProcessId->checkState() == Qt::Checked);
 }
 
-void FilterDialog::setContextId(QString id)
+void FilterDialog::setThreadId(QString id)
 {
-    ui->lineEditContextId->setText(id);
+    ui->lineEditThreadId->setText(id);
 }
 
-QString FilterDialog::getContextId()
+QString FilterDialog::getThreadId()
 {
-    return ui->lineEditContextId->text();
+    return ui->lineEditThreadId->text();
 }
 
-void FilterDialog::setEnableContextId(bool state)
+void FilterDialog::setEnableThreadId(bool state)
 {
-    ui->checkBoxContextId->setCheckState(state?Qt::Checked:Qt::Unchecked);
+    ui->checkBoxThreadId->setCheckState(state?Qt::Checked:Qt::Unchecked);
 }
 
-bool FilterDialog::getEnableContextId()
+bool FilterDialog::getEnableThreadId()
 {
-    return (ui->checkBoxContextId->checkState() == Qt::Checked);
+    return (ui->checkBoxThreadId->checkState() == Qt::Checked);
 }
 
 void FilterDialog::setHeaderText(QString id)
@@ -419,28 +419,28 @@ void FilterDialog::on_checkBoxMarkerClicked()
 
 }
 
-void FilterDialog::on_lineEditApplicationId_textEdited(const QString &)
+void FilterDialog::on_lineEditProcessId_textEdited(const QString &)
 {
-  if (ui->lineEditApplicationId->text().length())
-    ui->checkBoxApplicationId->setCheckState(Qt::Checked);
+  if (ui->lineEditProcessId->text().length())
+    ui->checkBoxProcessId->setCheckState(Qt::Checked);
   else
-    ui->checkBoxApplicationId->setCheckState(Qt::Unchecked);
+    ui->checkBoxProcessId->setCheckState(Qt::Unchecked);
 }
 
-void FilterDialog::on_lineEditEcuId_textEdited(const QString &)
+void FilterDialog::on_lineEdittag_textEdited(const QString &)
 {
-  if (ui->lineEditEcuId->text().length())
-    ui->checkBoxEcuId->setCheckState(Qt::Checked);
+  if (ui->lineEdittag->text().length())
+    ui->checkBoxtag->setCheckState(Qt::Checked);
   else
-    ui->checkBoxEcuId->setCheckState(Qt::Unchecked);
+    ui->checkBoxtag->setCheckState(Qt::Unchecked);
 }
 
-void FilterDialog::on_lineEditContextId_textEdited(const QString &)
+void FilterDialog::on_lineEditThreadId_textEdited(const QString &)
 {
-  if (ui->lineEditContextId->text().length())
-    ui->checkBoxContextId->setCheckState(Qt::Checked);
+  if (ui->lineEditThreadId->text().length())
+    ui->checkBoxThreadId->setCheckState(Qt::Checked);
   else
-    ui->checkBoxContextId->setCheckState(Qt::Unchecked);
+    ui->checkBoxThreadId->setCheckState(Qt::Unchecked);
 }
 
 void FilterDialog::on_lineEditHeaderText_textEdited(const QString &)
@@ -485,11 +485,11 @@ void FilterDialog::validate()
     error += "Expression: '%2' \n";
     error += "Error: %3 ";
 
-    if (!getEnableRegexp_Appid() && 4 < ui->lineEditApplicationId->text().length())
+    if (!getEnableRegexp_Procid() && 4 < ui->lineEditProcessId->text().length())
     {
-      ui->lineEditApplicationId->selectAll();
-      QMessageBox::warning(this, "Warning", "Application Id is more than four characters in length (and not in RegExp mode).");
-      ui->lineEditApplicationId->setFocus();
+      ui->lineEditProcessId->selectAll();
+      QMessageBox::warning(this, "Warning", "Process Id is more than four characters in length (and not in RegExp mode).");
+      ui->lineEditProcessId->setFocus();
       return;
     }
 
@@ -512,9 +512,9 @@ void FilterDialog::validate()
         return;
     }
 
-    rx.setPattern(getContextId());
+    rx.setPattern(getThreadId());
     if(!rx.isValid()) {
-        QMessageBox::warning(this, "Warning", error.arg("CONTEXTID").arg(rx.pattern()).arg(rx.errorString()));
+        QMessageBox::warning(this, "Warning", error.arg("THREADID").arg(rx.pattern()).arg(rx.errorString()));
         return;
     }
 

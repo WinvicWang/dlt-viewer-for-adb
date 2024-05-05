@@ -170,11 +170,11 @@ void DltTestRobotPlugin::updateMsg(int , QDltMsg &){
 
 void DltTestRobotPlugin::updateMsgDecoded(int , QDltMsg &msg)
 {
-    for(int num=0; num<filterEcuId.size(); num++)
+    for(int num=0; num<filtertag.size(); num++)
     {
-        if(filterEcuId[num]==msg.getEcuid() && filterAppId[num]==msg.getApid() && filterCtxId[num]==msg.getCtid() && tcpSocket)
+        if(filtertag[num]==msg.getTag() && filterProcId[num]==msg.getPid() && filterCtxId[num]==msg.getTid() && tcpSocket)
         {
-            QString text = msg.getEcuid() + " " + msg.getApid() + " " + msg.getCtid() + " " + msg.toStringPayload();
+            QString text = msg.getTag() + " " + msg.getPid() + " " + msg.getTid() + " " + msg.toStringPayload();
             qDebug() << "DltTestRobot: send message" << text;
             text += "\n";
             tcpSocket->write(text.toLatin1());
@@ -204,10 +204,10 @@ void DltTestRobotPlugin::readyRead()
 
             if(list[0]=="injection" && ecuList)
             {
-                QString ecuId = list[1];
+                QString tag = list[1];
                 for(int num=0;num<ecuList->length();num++)
                 {
-                    if(ecuList->at(num).contains(ecuId) && dltControl)
+                    if(ecuList->at(num).contains(tag) && dltControl)
                     {
                         list.removeAt(0);
                         list.removeAt(0);
@@ -221,14 +221,14 @@ void DltTestRobotPlugin::readyRead()
             {
                 if(list[1]=="clear")
                 {
-                    filterEcuId.clear();
-                    filterAppId.clear();
+                    filtertag.clear();
+                    filterProcId.clear();
                     filterCtxId.clear();
                 }
                 else if(list[1]=="add")
                 {
-                    filterEcuId.append(list[2]);
-                    filterAppId.append(list[3]);
+                    filtertag.append(list[2]);
+                    filterProcId.append(list[3]);
                     filterCtxId.append(list[4]);
                 }
 

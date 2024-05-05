@@ -48,7 +48,7 @@ QString QDltMsg::getStringFromId(const char *text)
     else if(text[3]==0)
         return QString(QByteArray(text,3));
     else
-        return QString(QByteArray(text,4));
+        return QString(QByteArray(text,strlen(text)));
 
 }
 
@@ -156,7 +156,7 @@ quint32 QDltMsg::checkMsgSize(const char *data,quint32 size)
     int sizeStorageHeader = 0;
     quint32 storageHeaderTimestampNanoseconds = 0;
     quint64 storageHeaderTimestampSeconds = 0;
-    QString storageHeaderEcuId;
+    QString storageHeadertag;
     bool withStorageHeader=false;
     const DltStorageHeader *storageheader = 0;
 
@@ -201,12 +201,12 @@ quint32 QDltMsg::checkMsgSize(const char *data,quint32 size)
                                (((quint64)(*((quint8*) (data + 10))))<<16)|
                                (((quint64)(*((quint8*) (data + 9))))<<8)|
                                (((quint64)(*((quint8*) (data + 8)))));
-            quint8 ecuIdLength = *((quint8*) (data + 13));
-            if(size < (int)(14+ecuIdLength)) {
+            quint8 tagLength = *((quint8*) (data + 13));
+            if(size < (int)(14+tagLength)) {
                 return 0; // length error
             }
-            storageHeaderEcuId = QString(QByteArray(data+14,ecuIdLength));
-            sizeStorageHeader = 14 + ecuIdLength;
+            storageHeadertag = QString(QByteArray(data+14,tagLength));
+            sizeStorageHeader = 14 + tagLength;
 
         }
         else
@@ -265,8 +265,8 @@ quint32 QDltMsg::checkMsgSize(const char *data,quint32 size)
 
         /* decode Header Type 2 */
         withSessionId = htyp2 & 0x10;
-        withAppContextId = htyp2 & 0x08;
-        withEcuId = htyp2 & 0x04;
+        withAppThreadId = htyp2 & 0x08;
+        withtag = htyp2 & 0x04;
         contentInformation = htyp2 & 0x03; // 0x0 = verbose, 0x1 = non verbose, 0x2 = control
         withHFMessageInfo = (contentInformation == 0x00) || (contentInformation == 0x02); // verbose or control
         withHFNumberOfArguments = (contentInformation == 0x00) || (contentInformation == 0x02); // verbose or control
@@ -328,7 +328,7 @@ bool QDltMsg::setMsg(const QByteArray& buf, bool withStorageHeader)
     int sizeStorageHeader = 0;
     quint32 storageHeaderTimestampNanoseconds = 0;
     quint64 storageHeaderTimestampSeconds = 0;
-    QString storageHeaderEcuId;
+    QString storageHeadertag;
 
     /* empty message */
     clear();
@@ -354,12 +354,12 @@ bool QDltMsg::setMsg(const QByteArray& buf, bool withStorageHeader)
                                (((quint64)(*((quint8*) (buf.constData() + 10))))<<16)|
                                (((quint64)(*((quint8*) (buf.constData() + 9))))<<8)|
                                (((quint64)(*((quint8*) (buf.constData() + 8)))));
-            quint8 ecuIdLength = *((quint8*) (buf.constData() + 13));
-            if(buf.size() < (int)(14+ecuIdLength)) {
+            quint8 tagLength = *((quint8*) (buf.constData() + 13));
+            if(buf.size() < (int)(14+tagLength)) {
                 return false; // length error
             }
-            storageHeaderEcuId = QString(buf.mid(14,ecuIdLength));
-            sizeStorageHeader = 14 + ecuIdLength;
+            storageHeadertag = QString(buf.mid(14,tagLength));
+            sizeStorageHeader = 14 + tagLength;
 
         }
         else
@@ -449,27 +449,27 @@ bool QDltMsg::setMsg(const QByteArray& buf, bool withStorageHeader)
             }
         }
 
-        /* extract ecu id */
+        /* extract tag */
         if ( DLT_IS_HTYP_WEID(standardheader->htyp) )
         {
-            ecuid = QDltMsg::getStringFromId(headerextra.ecu);
+            tag = QDltMsg::getStringFromId(headerextra.ecu);
         }
         else
         {
             if(storageheader)
-                ecuid = QDltMsg::getStringFromId(storageheader->ecu);
+                tag = QDltMsg::getStringFromId(storageheader->ecu);
         }
 
-        /* extract application id */
-        if ((DLT_IS_HTYP_UEH(standardheader->htyp)) && (extendedheader->apid[0]!=0))
+        /* extract process id */
+        if ((DLT_IS_HTYP_UEH(standardheader->htyp)) && (extendedheader->pid[0]!=0))
         {
-            apid = QDltMsg::getStringFromId(extendedheader->apid);
+            pid = QDltMsg::getStringFromId(extendedheader->pid);
         }
 
-        /* extract context id */
-        if ((DLT_IS_HTYP_UEH(standardheader->htyp)) && (extendedheader->ctid[0]!=0))
+        /* extract thread id */
+        if ((DLT_IS_HTYP_UEH(standardheader->htyp)) && (extendedheader->tid[0]!=0))
         {
-            ctid = QDltMsg::getStringFromId(extendedheader->ctid);
+            tid = QDltMsg::getStringFromId(extendedheader->tid);
         }
 
         /* extract type */
@@ -600,8 +600,8 @@ bool QDltMsg::setMsg(const QByteArray& buf, bool withStorageHeader)
 
         /* decode Header Type 2 */
         withSessionId = htyp2 & 0x10;
-        withAppContextId = htyp2 & 0x08;
-        withEcuId = htyp2 & 0x04;
+        withAppThreadId = htyp2 & 0x08;
+        withtag = htyp2 & 0x04;
         contentInformation = htyp2 & 0x03; // 0x0 = verbose, 0x1 = non verbose, 0x2 = control
         withHFMessageInfo = (contentInformation == 0x00) || (contentInformation == 0x02); // verbose or control
         withHFNumberOfArguments = (contentInformation == 0x00) || (contentInformation == 0x02); // verbose or control
@@ -710,8 +710,8 @@ bool QDltMsg::setMsg(const QByteArray& buf, bool withStorageHeader)
             headerLength += 4;
         }
 
-        /* read optional ECU Id */
-        if(withEcuId)
+        /* read optional Tag */
+        if(withtag)
         {
             if(buf.size() < (int)(sizeStorageHeader + headerLength + 1)) {
                 return false; // length error
@@ -721,17 +721,17 @@ bool QDltMsg::setMsg(const QByteArray& buf, bool withStorageHeader)
             if(buf.size() < (int)(sizeStorageHeader + headerLength + length)) {
                 return false; // length error
             }
-            ecuid = QString(buf.mid(headerLength + sizeStorageHeader,length));
+            tag = QString(buf.mid(headerLength + sizeStorageHeader,length));
             headerLength += length;
         }
         else
         {
             if(storageheader)
-                ecuid = QString(QByteArray(storageheader->ecu,4));
+                tag = QString(QByteArray(storageheader->ecu,4));
         }
 
-        /* read optional App Id and Ctx Id */
-        if(withAppContextId)
+        /* read optional Process Id and Ctx Id */
+        if(withAppThreadId)
         {
             if(buf.size() < (int)(sizeStorageHeader + headerLength + 1)) {
                 return false; // length error
@@ -741,14 +741,14 @@ bool QDltMsg::setMsg(const QByteArray& buf, bool withStorageHeader)
             if(buf.size() < (int)(sizeStorageHeader + headerLength + length)) {
                 return false; // length error
             }
-            apid = QString(buf.mid(headerLength + sizeStorageHeader,length));
+            pid = QString(buf.mid(headerLength + sizeStorageHeader,length));
             headerLength += length;
             length = *((quint8*) (buf.constData() + headerLength + sizeStorageHeader));
             headerLength += 1;
             if(buf.size() < (int)(sizeStorageHeader + headerLength + length)) {
                 return false; // length error
             }
-            ctid = QString(buf.mid(headerLength + sizeStorageHeader,length));
+            tid = QString(buf.mid(headerLength + sizeStorageHeader,length));
             headerLength += length;
         }
 
@@ -955,7 +955,7 @@ bool QDltMsg::getMsg(QByteArray &buf,bool withStorageHeader) {
         storageheader.pattern[1] = 'L';
         storageheader.pattern[2] = 'T';
         storageheader.pattern[3] = 0x01;
-        strncpy(storageheader.ecu,ecuid.toLatin1().constData(),ecuid.size()>3?4:ecuid.size()+1);
+        strncpy(storageheader.ecu,tag.toLatin1().constData(),tag.size()>3?4:tag.size()+1);
         storageheader.microseconds = microseconds;
         storageheader.seconds = time;
         buf += QByteArray((const char *)&storageheader,sizeof(DltStorageHeader));
@@ -982,7 +982,7 @@ bool QDltMsg::getMsg(QByteArray &buf,bool withStorageHeader) {
 
     /* write standard header extra */
     if(mode == DltModeVerbose) {
-        strncpy(headerextra.ecu,ecuid.toLatin1().constData(),ecuid.size()>3?4:ecuid.size()+1);
+        strncpy(headerextra.ecu,tag.toLatin1().constData(),tag.size()>3?4:tag.size()+1);
         buf += QByteArray((const char *)&(headerextra.ecu),sizeof(headerextra.ecu));
         headerextra.seid = DLT_SWAP_32(sessionid);
         buf += QByteArray((const char *)&(headerextra.seid),sizeof(headerextra.seid));
@@ -992,8 +992,8 @@ bool QDltMsg::getMsg(QByteArray &buf,bool withStorageHeader) {
 
     /* write extendedheader */
     if(mode == DltModeVerbose) {
-        strncpy(extendedheader.apid,apid.toLatin1().constData(),apid.size()>3?4:apid.size()+1);
-        strncpy(extendedheader.ctid,ctid.toLatin1().constData(),ctid.size()>3?4:ctid.size()+1);
+        strncpy(extendedheader.pid,pid.toLatin1().constData(),pid.size()>3?4:pid.size()+1);
+        strncpy(extendedheader.tid,tid.toLatin1().constData(),tid.size()>3?4:tid.size()+1);
         extendedheader.msin = 0;
         if(mode == DltModeVerbose) {
             extendedheader.msin |= DLT_MSIN_VERB;
@@ -1013,9 +1013,9 @@ bool QDltMsg::getMsg(QByteArray &buf,bool withStorageHeader) {
 
 void QDltMsg::clear()
 {
-    ecuid.clear();
-    apid.clear();
-    ctid.clear();
+    tag.clear();
+    pid.clear();
+    tid.clear();
     type = DltTypeUnknown;
     subtype = DltLogUnknown;
     mode = DltModeUnknown;
@@ -1037,8 +1037,8 @@ void QDltMsg::clear()
     versionNumber=0;
 
     withSessionId = false;
-    withAppContextId = false;
-    withEcuId = false;
+    withAppThreadId = false;
+    withtag = false;
     contentInformation = 0; // 0x0 = verbose, 0x1 = non verbose, 0x2 = control
     withHFMessageInfo = false; // verbose or control
     withHFNumberOfArguments = false; // verbose or control
@@ -1110,9 +1110,9 @@ QString QDltMsg::toStringHeader() const
     text += QString("%1.%2").arg(getTimeString()).arg(getMicroseconds(),6,10,QLatin1Char('0'));
     text += QString(" %1.%2").arg(getTimestamp()/10000).arg(getTimestamp()%10000,4,10,QLatin1Char('0'));
     text += QString(" %1").arg(getMessageCounter());
-    text += QString(" %1").arg(getEcuid());
-    text += QString(" %1").arg(getApid());
-    text += QString(" %1").arg(getCtid());
+    text += QString(" %1").arg(getTag());
+    text += QString(" %1").arg(getPid());
+    text += QString(" %1").arg(getTid());
     text += QString(" %1").arg(getSessionid());
     text += QString(" %2").arg(getTypeString());
     text += QString(" %2").arg(getSubtypeString());
@@ -1276,24 +1276,24 @@ void QDltMsg::setWithSessionId(bool newWithSessionId)
     withSessionId = newWithSessionId;
 }
 
-bool QDltMsg::getWithAppContextId() const
+bool QDltMsg::getWithAppThreadId() const
 {
-    return withAppContextId;
+    return withAppThreadId;
 }
 
-void QDltMsg::setWithAppContextId(bool newWithAppContextId)
+void QDltMsg::setWithAppThreadId(bool newWithAppThreadId)
 {
-    withAppContextId = newWithAppContextId;
+    withAppThreadId = newWithAppThreadId;
 }
 
-bool QDltMsg::getWithEcuId() const
+bool QDltMsg::getWithtag() const
 {
-    return withEcuId;
+    return withtag;
 }
 
-void QDltMsg::setWithEcuId(bool newWithEcuId)
+void QDltMsg::setWithtag(bool newWithtag)
 {
-    withEcuId = newWithEcuId;
+    withtag = newWithtag;
 }
 
 quint8 QDltMsg::getContentInformation() const
@@ -1528,7 +1528,7 @@ void QDltMsg::genMsg()
     if(mode == DltModeVerbose) {
         uint16_t standardheaderlen = sizeof(DltStandardHeader) + sizeof(DltExtendedHeader) + payload.size();
         standardheader.htyp |= DLT_HTYP_UEH;
-        if(!ecuid.isEmpty()) {
+        if(!tag.isEmpty()) {
             standardheader.htyp |= DLT_HTYP_WEID;
             standardheaderlen += sizeof(headerextra.ecu);
         }
@@ -1550,8 +1550,8 @@ void QDltMsg::genMsg()
 
     // write standard header extra
     if(mode == DltModeVerbose) {
-        if(!ecuid.isEmpty()) {
-            strncpy(headerextra.ecu,ecuid.toLatin1().constData(),ecuid.size()>3?4:ecuid.size()+1);
+        if(!tag.isEmpty()) {
+            strncpy(headerextra.ecu,tag.toLatin1().constData(),tag.size()>3?4:tag.size()+1);
             header += QByteArray((const char *)&(headerextra.ecu),sizeof(headerextra.ecu));
         }
         if(sessionid!=0) {
@@ -1566,8 +1566,8 @@ void QDltMsg::genMsg()
 
     // write extendedheader
     if(mode == DltModeVerbose) {
-        strncpy(extendedheader.apid,apid.toLatin1().constData(),apid.size()>3?4:apid.size()+1);
-        strncpy(extendedheader.ctid,ctid.toLatin1().constData(),ctid.size()>3?4:ctid.size()+1);
+        strncpy(extendedheader.pid,pid.toLatin1().constData(),pid.size()>3?4:pid.size()+1);
+        strncpy(extendedheader.tid,tid.toLatin1().constData(),tid.size()>3?4:tid.size()+1);
         extendedheader.msin = 0;
         if(mode == DltModeVerbose) {
             extendedheader.msin |= DLT_MSIN_VERB;

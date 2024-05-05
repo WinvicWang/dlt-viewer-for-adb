@@ -65,9 +65,9 @@ QDltControl::~QDltControl()
 
 }
 
-void QDltControl::sendInjection(int index,QString applicationId,QString contextId,int serviceId,QByteArray data)
+void QDltControl::sendInjection(int index,QString processId,QString threadId,int serviceId,QByteArray data)
 {
-    emit sendInjectionSignal(index,applicationId,contextId,serviceId,data);
+    emit sendInjectionSignal(index,processId,threadId,serviceId,data);
 }
 
 void QDltControl::jumpToMsg(int index)

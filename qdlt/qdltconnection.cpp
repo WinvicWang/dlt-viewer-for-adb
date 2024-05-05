@@ -214,9 +214,9 @@ bool QDltConnection::parseAscii(QDltMsg &msg)
             {
                 // set parameters of DLT message to be generated
                 msg.clear();
-                msg.setEcuid("");
-                msg.setApid("SER");
-                msg.setCtid("ASC");
+                msg.setTag("");
+                msg.setPid("SER");
+                msg.setTid("ASC");
                 msg.setMode(QDltMsg::DltModeVerbose);
                 msg.setType(QDltMsg::DltTypeLog);
                 msg.setSubtype(QDltMsg::DltLogInfo);

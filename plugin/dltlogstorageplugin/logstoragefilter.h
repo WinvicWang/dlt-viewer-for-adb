@@ -35,13 +35,13 @@ class LogstorageFilter
 {
 public:
     LogstorageFilter();
-    LogstorageFilter(QString apid, QString ctid, QString logLevel, QString fileName, unsigned int fileSize, unsigned int noFiles);
+    LogstorageFilter(QString pid, QString tid, QString logLevel, QString fileName, unsigned int fileSize, unsigned int noFiles);
 
-    QString getApid() const { return m_apid; }
-    void setApid(const QString &value) { m_apid = value; }
+    QString getPid() const { return m_pid; }
+    void setPid(const QString &value) { m_pid = value; }
 
-    QString getCtid() const { return m_ctid; }
-    void setCtid(const QString &value) { m_ctid = value; }
+    QString getTid() const { return m_tid; }
+    void setTid(const QString &value) { m_tid = value; }
 
     QString getLogLevel() const { return m_logLevel; }
     void setLogLevel(const QString &value) { m_logLevel = value; }
@@ -60,8 +60,8 @@ public:
 
 
 private:
-    QString m_apid;
-    QString m_ctid;
+    QString m_pid;
+    QString m_tid;
     QString m_logLevel;
     QString m_fileName;
     unsigned int m_fileSize;

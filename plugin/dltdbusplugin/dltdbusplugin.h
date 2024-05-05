@@ -32,15 +32,15 @@
 
 #define DLT_DBUS_PLUGIN_VERSION "2.0.0"
 
-// we restrict the maximum number of APID/CTID pairs because of performance issues
+// we restrict the maximum number of PID/TID pairs because of performance issues
 #define MAX_LOGIDS 10
-// maximum allowed number of characters for APID/ CTID
+// maximum allowed number of characters for PID/ TID
 #define LOGIDMAXCHAR 4
 
 typedef struct
 {
-    QString apid;
-    QString ctid;
+    QString pid;
+    QString tid;
 } s_logid;
 
 
@@ -142,7 +142,7 @@ private:
     QDltControl *dltControl;
     QString errorText;
 
-    // subsequent stringlist is used to store the APID/CTID combination
+    // subsequent stringlist is used to store the PID/TID combination
     // which is used to detect/select payload to be decoded
     QStringList dbus_mesg_identifiers;
     s_logid logid[MAX_LOGIDS];

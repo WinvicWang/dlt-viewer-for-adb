@@ -103,8 +103,8 @@ bool SearchDialog::getRegExp()
 bool SearchDialog::getNextClicked(){return nextClicked;}
 bool SearchDialog::getOnceClicked(){return onceClicked;}
 
-QString SearchDialog::getApIDText(){ return ui->apIdlineEdit->text();}
-QString SearchDialog::getCtIDText(){ return ui->ctIdlineEdit->text();}
+QString SearchDialog::getpidText(){ return ui->pidlineEdit->text();}
+QString SearchDialog::gettidText(){ return ui->tidlineEdit->text();}
 
 
 QString SearchDialog::getPayLoadStampStart()
@@ -344,26 +344,26 @@ int SearchDialog::find()
         //qDebug() << "Payload search is disabled" << payloadStart.isEmpty() << payloadEnd.isEmpty()  << __LINE__;
     }
 
-    //check APID and CTID search
-    stApid = getApIDText();
-    stCtid = getCtIDText();
-    if( stApid.size() > 0 || stCtid.size() > 0 ) // so we need to consider what is given here
+    //check PID and TID search
+    stPid = getpidText();
+    stTid = gettidText();
+    if( stPid.size() > 0 || stTid.size() > 0 ) // so we need to consider what is given here
     {
-        if( stApid.size() > 4 || stCtid.size() > 4 )
+        if( stPid.size() > 4 || stTid.size() > 4 )
         {
-            qDebug() << "Given APID or CTID exceeds limit !";
+            qDebug() << "Given PID or TID exceeds limit !";
             if ( false == fSilentMode)
             {
-            QMessageBox::warning(0, QString("Search"), QString("Given APID or CTID exceeds limit !"));
+            QMessageBox::warning(0, QString("Search"), QString("Given PID or TID exceeds limit !"));
             }
             emit searchProgressChanged(false);
             return 2;
         }
-        fIs_APID_CTID_requested = true;
+        fIs_PID_TID_requested = true;
     }
     else
     {
-     fIs_APID_CTID_requested = false;
+     fIs_PID_TID_requested = false;
     }
 
     findMessages(startLine,searchBorder,searchTextRegExpression);
@@ -484,27 +484,27 @@ void SearchDialog::findMessages(long int searchLine, long int searchBorder, QReg
 
         } // get the header text in case not empty
         headerText = text;
-        if ( true == fIs_APID_CTID_requested )
+        if ( true == fIs_PID_TID_requested )
             {
-              QString APID = headerText.section(" ",5,5);
-              QString CTID = headerText.section(" ",6,6);
+              QString PID = headerText.section(" ",5,5);
+              QString TID = headerText.section(" ",6,6);
               // and check if the condition is valid
-              if ( ( APID.compare(stApid,is_Case_Sensitive) == 0 ) && ( stCtid.size() == 0 ) )
+              if ( ( PID.compare(stPid,is_Case_Sensitive) == 0 ) && ( stTid.size() == 0 ) )
               {
-                 // qDebug() << "APID hit" << searchLine << __LINE__;
+                 // qDebug() << "PID hit" << searchLine << __LINE__;
               }
-              else if ( ( CTID.compare(stCtid,is_Case_Sensitive) == 0 ) && ( stApid.size() == 0 ) )
+              else if ( ( TID.compare(stTid,is_Case_Sensitive) == 0 ) && ( stPid.size() == 0 ) )
               {
-                 // qDebug() << "CTID hit" << searchLine << __LINE__;
+                 // qDebug() << "TID hit" << searchLine << __LINE__;
               }
-              else if( ( CTID.compare(stCtid,is_Case_Sensitive) == 0) && ( APID.compare(stApid,is_Case_Sensitive) == 0 ) )
+              else if( ( TID.compare(stTid,is_Case_Sensitive) == 0) && ( PID.compare(stPid,is_Case_Sensitive) == 0 ) )
               {
-                 // qDebug() << "CTID & APID hit" << searchLine << __LINE__;
+                 // qDebug() << "TID & PID hit" << searchLine << __LINE__;
               }
               else
               {
-                 //qDebug() << APID << CTID << searchLine;
-                 continue; // because if APID or CTID  doesn not fit there is no need to search in any payload or header
+                 //qDebug() << PID << TID << searchLine;
+                 continue; // because if PID or TID  doesn not fit there is no need to search in any payload or header
               }
             }
 

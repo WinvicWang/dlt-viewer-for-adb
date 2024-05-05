@@ -43,15 +43,15 @@ QDltFilter& QDltFilter::operator= (QDltFilter const& _filter)
     type = _filter.type;
     name = _filter.name;
 
-    ecuid = _filter.ecuid;
-    apid = _filter.apid;
-    ctid = _filter.ctid;
+    tag = _filter.tag;
+    pid = _filter.pid;
+    tid = _filter.tid;
     header = _filter.header;
     payload = _filter.payload;
     regex_search = _filter.regex_search;
     regex_replace = _filter.regex_replace;
 
-    enableRegexp_Appid       = _filter.enableRegexp_Appid;
+    enableRegexp_Procid       = _filter.enableRegexp_Procid;
     enableRegexp_Context     = _filter.enableRegexp_Context;
     enableRegexp_Header      = _filter.enableRegexp_Header;
     enableRegexp_Payload     = _filter.enableRegexp_Payload;
@@ -60,9 +60,9 @@ QDltFilter& QDltFilter::operator= (QDltFilter const& _filter)
     enableRegexSearchReplace = _filter.enableRegexSearchReplace;
 
     enableFilter = _filter.enableFilter;
-    enableEcuid = _filter.enableEcuid;
-    enableApid = _filter.enableApid;
-    enableCtid = _filter.enableCtid;
+    enableTag = _filter.enableTag;
+    enablePid = _filter.enablePid;
+    enableTid = _filter.enableTid;
     enableHeader = _filter.enableHeader;
     enablePayload = _filter.enablePayload;
     enableCtrlMsgs = _filter.enableCtrlMsgs;
@@ -81,7 +81,7 @@ QDltFilter& QDltFilter::operator= (QDltFilter const& _filter)
     headerRegularExpression  = _filter.headerRegularExpression;
     payloadRegularExpression = _filter.payloadRegularExpression;
     contextRegularExpression = _filter.contextRegularExpression;
-    appidRegularExpression   = _filter.appidRegularExpression;
+    procidRegularExpression   = _filter.procidRegularExpression;
 
     return *this;
 }
@@ -91,24 +91,24 @@ void QDltFilter::clear()
     type = QDltFilter::positive;
     name = "New Filter";
 
-    ecuid.clear();
-    apid.clear();
-    ctid.clear();
+    tag.clear();
+    pid.clear();
+    tid.clear();
     header.clear();
     payload.clear();
     regex_search.clear();
     regex_replace.clear();
 
-    enableRegexp_Appid = false;
+    enableRegexp_Procid = false;
     enableRegexp_Context = false;
     enableRegexp_Header = false;
     enableRegexp_Payload = false;
     ignoreCase_Header  = false;
     ignoreCase_Payload = false;
     enableFilter = false;
-    enableEcuid = false;
-    enableApid = false;
-    enableCtid = false;
+    enableTag = false;
+    enablePid = false;
+    enableTid = false;
     enableHeader = false;
     enablePayload = false;
     enableCtrlMsgs = false;
@@ -144,8 +144,8 @@ bool QDltFilter::compileRegexps()
 
     headerRegularExpression.setPattern(header);
     payloadRegularExpression.setPattern(payload);
-    contextRegularExpression.setPattern(ctid);
-    appidRegularExpression.setPattern(apid);
+    contextRegularExpression.setPattern(tid);
+    procidRegularExpression.setPattern(pid);
 
     headerRegularExpression.setPatternOptions(
         ignoreCase_Header ? QRegularExpression::CaseInsensitiveOption
@@ -157,20 +157,20 @@ bool QDltFilter::compileRegexps()
     return (headerRegularExpression.isValid() &&
             payloadRegularExpression.isValid() &&
             contextRegularExpression.isValid() &&
-            appidRegularExpression.isValid());
+            procidRegularExpression.isValid());
 }
 
 bool QDltFilter::match(QDltMsg &msg) const
 {
 
-    if( (true == enableEcuid) && (msg.getEcuid() != ecuid))
+    if( (true == enableTag) && (msg.getTag() != tag))
     {
         return false;
     }
 
-    if( true == enableRegexp_Appid )
+    if( true == enableRegexp_Procid )
     {
-        if( (true == enableApid) && ( false == appidRegularExpression.match(msg.getApid()).hasMatch() ) )
+        if( (true == enablePid) && ( false == procidRegularExpression.match(msg.getPid()).hasMatch() ) )
         {
             return false;
         }
@@ -178,7 +178,7 @@ bool QDltFilter::match(QDltMsg &msg) const
     }
     else
     {
-        if( (true == enableApid) && (msg.getApid() != apid))
+        if( (true == enablePid) && (msg.getPid() != pid))
         {
             return false;
         }
@@ -186,14 +186,14 @@ bool QDltFilter::match(QDltMsg &msg) const
 
     if(true == enableRegexp_Context)
     {
-        if( (true == enableCtid) && ( false == contextRegularExpression.match(msg.getCtid()).hasMatch() ) )
+        if( (true == enableTid) && ( false == contextRegularExpression.match(msg.getTid()).hasMatch() ) )
         {
             return false;
         }
     }
     else
     {
-        if( (true ==enableCtid) && ( false == msg.getCtid().contains(ctid) ) )
+        if( (true ==enableTid) && ( false == msg.getTid().contains(tid) ) )
         {
             return false;
         }
@@ -275,19 +275,19 @@ void QDltFilter::LoadFilterItem(QXmlStreamReader &xml)
           name = xml.readElementText();
 
     }
-    if(xml.name() == QString("ecuid"))
+    if(xml.name() == QString("tag"))
     {
-          ecuid = xml.readElementText();
+          tag = xml.readElementText();
 
     }
-    if(xml.name() == QString("applicationid"))
+    if(xml.name() == QString("processid"))
     {
-          apid = xml.readElementText();
+          pid = xml.readElementText();
 
     }
-    if(xml.name() == QString("contextid"))
+    if(xml.name() == QString("threadid"))
     {
-          ctid = xml.readElementText();
+          tid = xml.readElementText();
 
     }
     if(xml.name() == QString("headertext"))
@@ -308,13 +308,13 @@ void QDltFilter::LoadFilterItem(QXmlStreamReader &xml)
     }
     if(xml.name() == QString("enableregexp"))    //legacy
     {
-        enableRegexp_Appid   = xml.readElementText().toInt();
+        enableRegexp_Procid   = xml.readElementText().toInt();
         enableRegexp_Context = xml.readElementText().toInt();
         enableRegexp_Header  = xml.readElementText().toInt();
     }
-    if(xml.name() == QString("enableregexp_Appid"))
+    if(xml.name() == QString("enableregexp_Procid"))
     {
-          enableRegexp_Appid = xml.readElementText().toInt();
+          enableRegexp_Procid = xml.readElementText().toInt();
     }
     if(xml.name() == QString("enableregexp_Context"))
     {
@@ -340,17 +340,17 @@ void QDltFilter::LoadFilterItem(QXmlStreamReader &xml)
     {
           enableFilter = xml.readElementText().toInt();
     }
-    if(xml.name() == QString("enableecuid"))
+    if(xml.name() == QString("enabletag"))
     {
-          enableEcuid = xml.readElementText().toInt();
+          enableTag = xml.readElementText().toInt();
     }
-    if(xml.name() == QString("enableapplicationid"))
+    if(xml.name() == QString("enableprocessid"))
     {
-          enableApid = xml.readElementText().toInt();;
+          enablePid = xml.readElementText().toInt();;
     }
-    if(xml.name() == QString("enablecontextid"))
+    if(xml.name() == QString("enablethreadid"))
     {
-          enableCtid = xml.readElementText().toInt();;
+          enableTid = xml.readElementText().toInt();;
     }
     if(xml.name() == QString("enableheadertext"))
     {
@@ -412,9 +412,9 @@ void QDltFilter::SaveFilterItem(QXmlStreamWriter &xml)
     xml.writeTextElement("type",QString("%1").arg((int)(type)));
 
     xml.writeTextElement("name",name);
-    xml.writeTextElement("ecuid",ecuid);
-    xml.writeTextElement("applicationid",apid);
-    xml.writeTextElement("contextid",ctid);
+    xml.writeTextElement("tag",tag);
+    xml.writeTextElement("processid",pid);
+    xml.writeTextElement("threadid",tid);
     xml.writeTextElement("headertext",header);
     xml.writeTextElement("payloadtext",payload);
     xml.writeTextElement("regex_search",regex_search);
@@ -422,16 +422,16 @@ void QDltFilter::SaveFilterItem(QXmlStreamWriter &xml)
     xml.writeTextElement("messageIdMin",QString("%1").arg(messageIdMin));
     xml.writeTextElement("messageIdMax",QString("%1").arg(messageIdMax));
 
-    xml.writeTextElement("enableregexp_Appid",QString("%1").arg(enableRegexp_Appid));
+    xml.writeTextElement("enableregexp_Procid",QString("%1").arg(enableRegexp_Procid));
     xml.writeTextElement("enableregexp_Context",QString("%1").arg(enableRegexp_Context));
     xml.writeTextElement("enableregexp_Header",QString("%1").arg(enableRegexp_Header));
     xml.writeTextElement("enableregexp_Payload",QString("%1").arg(enableRegexp_Payload));
     xml.writeTextElement("ignoreCase_Header",QString("%1").arg(ignoreCase_Header));
     xml.writeTextElement("ignoreCase_Payload",QString("%1").arg(ignoreCase_Payload));
     xml.writeTextElement("enablefilter",QString("%1").arg(enableFilter));
-    xml.writeTextElement("enableecuid",QString("%1").arg(enableEcuid));
-    xml.writeTextElement("enableapplicationid",QString("%1").arg(enableApid));
-    xml.writeTextElement("enablecontextid",QString("%1").arg(enableCtid));
+    xml.writeTextElement("enabletag",QString("%1").arg(enableTag));
+    xml.writeTextElement("enableprocessid",QString("%1").arg(enablePid));
+    xml.writeTextElement("enablethreadid",QString("%1").arg(enableTid));
     xml.writeTextElement("enableheadertext",QString("%1").arg(enableHeader));
     xml.writeTextElement("enablepayloadtext",QString("%1").arg(enablePayload));
     xml.writeTextElement("enablectrlmsgs",QString("%1").arg(enableCtrlMsgs));

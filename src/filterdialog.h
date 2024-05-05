@@ -45,8 +45,8 @@ public:
     void setActive(bool state);
     bool getEnableActive();
 
-    void setEnableRegexp_Appid(bool state);
-    bool getEnableRegexp_Appid();
+    void setEnableRegexp_Procid(bool state);
+    bool getEnableRegexp_Procid();
 
     void setEnableRegexp_Context(bool state);
     bool getEnableRegexp_Context();
@@ -64,20 +64,20 @@ public:
     bool getIgnoreCase_Payload();
 
 
-    void setEcuId(QString id);
-    QString getEcuId();
-    void setEnableEcuId(bool state);
-    bool getEnableEcuId();
+    void settag(QString id);
+    QString gettag();
+    void setEnabletag(bool state);
+    bool getEnabletag();
 
-    void setApplicationId(QString id);
-    QString getApplicationId();
-    void setEnableApplicationId(bool state);
-    bool getEnableApplicationId();
+    void setProcessId(QString id);
+    QString getProcessId();
+    void setEnableProcessId(bool state);
+    bool getEnableProcessId();
 
-    void setContextId(QString id);
-    QString getContextId();
-    void setEnableContextId(bool state);
-    bool getEnableContextId();
+    void setThreadId(QString id);
+    QString getThreadId();
+    void setEnableThreadId(bool state);
+    bool getEnableThreadId();
 
     void setHeaderText(QString id);
     QString getHeaderText();
@@ -137,9 +137,9 @@ public slots:
     void on_checkRegex(const QString&);
     void validate();
 private slots:
-    void on_lineEditApplicationId_textEdited(const QString &arg1);
-    void on_lineEditEcuId_textEdited(const QString &arg1);
-    void on_lineEditContextId_textEdited(const QString &arg1);
+    void on_lineEditProcessId_textEdited(const QString &arg1);
+    void on_lineEdittag_textEdited(const QString &arg1);
+    void on_lineEditThreadId_textEdited(const QString &arg1);
     void on_lineEditHeaderText_textEdited(const QString &arg1);
     void on_lineEditPayloadText_textEdited(const QString &arg1);
     void on_comboBoxLogLevelMax_currentIndexChanged(int index);

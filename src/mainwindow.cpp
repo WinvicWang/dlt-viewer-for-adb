@@ -17,6 +17,7 @@
  * @licence end@
  */
 
+
 #include <iostream>
 #include <algorithm>
 #include <QMimeData>
@@ -333,7 +334,7 @@ void MainWindow::initState()
 
     /* initialize injection */
     injectionAplicationId.clear();
-    injectionContextId.clear();
+    injectionThreadId.clear();
     injectionServiceId.clear();
     injectionData.clear();
     injectionDataBinary = false;
@@ -619,7 +620,7 @@ void MainWindow::initFileHandling()
     else
     {
         /* Load default project file */
-        this->setWindowTitle(QString("DLT Viewer - unnamed project - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
+        this->setWindowTitle(QString("DLT Viewer - ADB Extension - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
         if(settings->defaultProjectFile)
         {
             qDebug() << QString("Loading default project %1").arg(settings->defaultProjectFileName);
@@ -1713,7 +1714,7 @@ void MainWindow::contextLoadingFile(QDltMsg &msg)
         for(int num = 0; num < project.ecu->topLevelItemCount (); num++)
         {
             EcuItem *ecuitem = (EcuItem*)project.ecu->topLevelItem(num);
-            if(ecuitem->id == msg.getEcuid())
+            if(ecuitem->id == msg.getTag())
             {
                 ecuitemFound = ecuitem;
                 break;
@@ -1726,7 +1727,7 @@ void MainWindow::contextLoadingFile(QDltMsg &msg)
             ecuitemFound = new EcuItem(0);
 
             /* update ECU item */
-            ecuitemFound->id = msg.getEcuid();
+            ecuitemFound->id = msg.getTag();
             ecuitemFound->update();
 
             /* add ECU to configuration */
@@ -1764,14 +1765,14 @@ void MainWindow::reloadLogFileProgressText(QString text)
     statusProgressBar->setFormat(QString("%1 %p%").arg(text));
 }
 
-void MainWindow::reloadLogFileVersionString(QString ecuId, QString version)
+void MainWindow::reloadLogFileVersionString(QString tag, QString version)
 {
     // version message found in loading file, only called when loading a logfile !
 
-    if(false == autoloadPluginsVersionEcus.contains(ecuId))
+    if(false == autoloadPluginsVersionEcus.contains(tag))
     {
       autoloadPluginsVersionStrings.append(version);
-      autoloadPluginsVersionEcus.append(ecuId);
+      autoloadPluginsVersionEcus.append(tag);
 
       QFontMetrics fm = QFontMetrics(statusFileVersion->font());
       QString versionString = "Version: " + autoloadPluginsVersionStrings.join("\r\n");
@@ -1780,7 +1781,7 @@ void MainWindow::reloadLogFileVersionString(QString ecuId, QString version)
       statusFileVersion->setToolTip(versionString);
       if( (settings->pluginsAutoloadPath != 0 ) && ( pluginsEnabled == true ))
        {
-          qDebug() << "Trigger plugin autoload for ECU" << ecuId << "with version" << version;
+          qDebug() << "Trigger plugin autoload for ECU" << tag << "with version" << version;
           pluginsAutoload(version);
        }
     }
@@ -2076,7 +2077,7 @@ void MainWindow::applySettings()
         case(FieldNames::SessionId): m_searchresultsTable->setColumnHidden(col, true);break;
         case(FieldNames::Counter):   m_searchresultsTable->setColumnHidden(col, true);break;
         case(FieldNames::Type):      m_searchresultsTable->setColumnHidden(col, true);break;
-        case(FieldNames::Subtype):   m_searchresultsTable->setColumnHidden(col, true);break;
+        case(FieldNames::LogLevel):   m_searchresultsTable->setColumnHidden(col, true);break;
         case(FieldNames::Mode):      m_searchresultsTable->setColumnHidden(col, true);break;
         case(FieldNames::ArgCount):  m_searchresultsTable->setColumnHidden(col, true);break;
         default:m_searchresultsTable->setColumnHidden(col, !(FieldNames::getColumnShown((FieldNames::Fields)col,settings)));break;
@@ -2176,7 +2177,7 @@ void MainWindow::on_action_menuProject_New_triggered()
 
     /* create new project */
 
-    this->setWindowTitle(QString("DLT Viewer - unnamed project - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
+    this->setWindowTitle(QString("DLT Viewer - ADB Extension - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
     project.Clear();
 
     /* Update the ECU list in control plugins */
@@ -2491,6 +2492,7 @@ void MainWindow::on_action_menuConfig_ECU_Edit_triggered()
         {
             bool interfaceChanged = false;
             if((ecuitem->interfacetype != dlg.interfacetype() ||
+                ecuitem->adbId != dlg.adbId() ||
                 ecuitem->getHostname() != dlg.hostname() ||
                 ecuitem->getIpport() != dlg.tcpport() ||
                 ecuitem->getUdpport() != dlg.udpport() ||
@@ -3238,11 +3240,16 @@ void MainWindow::disconnectECU(EcuItem *ecuitem)
             if (ecuitem->socket->state()!=QAbstractSocket::UnconnectedState)
                 ecuitem->socket->disconnectFromHost();
         }
-        else
+        else if(ecuitem->interfacetype == EcuItem::INTERFACETYPE_SERIAL_DLT || ecuitem->interfacetype == EcuItem::INTERFACETYPE_SERIAL_ASCII)
         {
             /* Serial */
             qDebug() << "Close serial port" << ecuitem->getPort();
             ecuitem->m_serialport->close();
+        } else if (ecuitem->interfacetype == EcuItem::INTERFACETYPE_ADB) {
+            qDebug() << "Close ADB port" << ecuitem->getPort();
+            QObject::disconnect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
+            ecuitem->process.close();
+            ecuitem->process.reset();
         }
 
         ecuitem->InvalidAll();
@@ -3279,6 +3286,137 @@ void MainWindow::on_action_menuConfig_Disconnect_triggered()
     else
         QMessageBox::warning(0, QString("DLT Viewer"),
                              QString("No ECU selected in configuration!"));
+}
+
+#define DLT_MSG_MAX_LENGTH 10240
+#define _WORD_BYTE0(x) (uint8_t((x) & 0xFF))
+#define _WORD_BYTE1(x) (uint8_t((x) >> 8))
+#define MIN(x,y) ((x) > (y) ? (y) : (x))
+
+void MainWindow::readAdbData(EcuItem *ecuitem)
+{
+    static char g_date[DLT_ID_SIZE];
+    static char g_time[DLT_ID_SIZE];
+    static char g_pid[DLT_ID_SIZE];
+    static char g_tid[DLT_ID_SIZE];
+    static char g_logLevel[DLT_ID_SIZE];
+    static char g_tag[DLT_ID_SIZE];
+    static char g_content[DLT_MSG_MAX_LENGTH - 6*DLT_ID_SIZE];
+
+    QString output(ecuitem->process.readAll());
+    if (output.size() == 0) {
+        return;
+    }
+
+    QStringList list = output.split("\n");
+
+    while (list.length() > 0) {
+        output = list.takeFirst();
+
+        if (strlen(output.toStdString().c_str()) == 0) {
+            continue;
+        }
+
+        sscanf(output.toStdString().c_str(), "%s %s %s %s %s %s %9999[^\n]", g_date, g_time, g_pid, g_tid, g_logLevel, g_tag, g_content);
+
+        DltLogLevelType level = DLT_LOG_INFO;
+        if (!strncmp(g_logLevel, "F", 1)){
+            level = DLT_LOG_FATAL;
+        } else if (!strncmp(g_logLevel, "E", 1)){
+            level = DLT_LOG_ERROR;
+        } else if (!strncmp(g_logLevel, "W", 1)){
+            level = DLT_LOG_WARN;
+        } else if (!strncmp(g_logLevel, "I", 1)){
+            level = DLT_LOG_INFO;
+        } else if (!strncmp(g_logLevel, "D", 1)){
+            level = DLT_LOG_DEBUG;
+        } else if (!strncmp(g_logLevel, "V", 1)){
+            level = DLT_LOG_VERBOSE;
+        }
+
+        if (level > ecuitem->loglevel) {
+            continue;
+        }
+
+        level = (DltLogLevelType)(level - 1);
+
+        int taglen= strlen(g_tag);
+        if ((taglen > 1 && taglen <= DLT_ID_SIZE)  && (g_tag[strlen(g_tag) - 1] == ':')){
+            g_tag[strlen(g_tag) - 1] = '\0';
+        }
+
+        char *content = NULL;
+        if (g_content[0] == ':') {
+            content = &g_content[1];
+        } else {
+            content = g_content;
+        }
+
+        int index = 0;
+        static int counter = 0;
+        char g_dlt_msg[DLT_MSG_MAX_LENGTH] = {0};
+        g_dlt_msg[index++] = 0x3d;
+        g_dlt_msg[index++] = ++counter;
+        index+=2;
+        memcpy(&g_dlt_msg[index], g_tag, MIN(strlen(g_tag),DLT_ID_SIZE));
+        index += DLT_ID_SIZE;
+        g_dlt_msg[index++] = 0;
+        g_dlt_msg[index++] = 0;
+        g_dlt_msg[index++] = 0;
+        g_dlt_msg[index++] = 0;
+        g_dlt_msg[index++] = 0;
+        g_dlt_msg[index++] = 0;
+        g_dlt_msg[index++] = 0;
+        g_dlt_msg[index++] = 0;
+
+        //Set log level
+        g_dlt_msg[index++] = 0x11 + (level << 4);
+        g_dlt_msg[index++] = 0x01;
+
+        //Set pid and tid
+        memcpy(&g_dlt_msg[index], g_pid, MIN(strlen(g_pid),DLT_ID_SIZE)); index += DLT_ID_SIZE;
+        memcpy(&g_dlt_msg[index], g_tid, MIN(strlen(g_tid),DLT_ID_SIZE)); index += DLT_ID_SIZE;
+        //Send ASCII String
+        g_dlt_msg[index++] = 0x00;
+        g_dlt_msg[index++] = 0x02;
+        g_dlt_msg[index++] = 0x00;
+        g_dlt_msg[index++] = 0x00;
+
+        //Set content
+        uint16_t length = strlen(content);
+        g_dlt_msg[index++] = _WORD_BYTE0(length);
+        g_dlt_msg[index++] = _WORD_BYTE1(length);
+        memcpy(&g_dlt_msg[index], content, length); index += length;
+        g_dlt_msg[index++] = '\0';
+
+        //Set msg length
+        g_dlt_msg[2] = _WORD_BYTE1(index);
+        g_dlt_msg[3] = _WORD_BYTE0(index);
+
+        data.append(QByteArray(g_dlt_msg, index));
+    }
+}
+
+void MainWindow::adbDisconnected(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    for(int num = 0; num < project.ecu->topLevelItemCount (); num++)
+    {
+        EcuItem *ecuitem = (EcuItem*)project.ecu->topLevelItem(num);
+        if (ecuitem->interfacetype == EcuItem::INTERFACETYPE_ADB) {
+            qDebug() << "adbDisconnected, Restart Ecu device:" + QString::number(num);
+            QObject::disconnect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
+            ecuitem->process.close();
+            ecuitem->process.reset();
+
+            ecuitem->process.setProcessChannelMode(QProcess::MergedChannels);
+            if (ecuitem->adbId == "default" || ecuitem->adbId == "") {
+                ecuitem->process.start("adb.exe", {"logcat"});
+            } else {
+                ecuitem->process.start("adb.exe", {"-s", ecuitem->adbId, "logcat"});
+            }
+            QObject::connect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
+        }
+    }
 }
 
 void MainWindow::connectECU(EcuItem* ecuitem,bool force)
@@ -3405,7 +3543,7 @@ void MainWindow::connectECU(EcuItem* ecuitem,bool force)
                 }
             }
         }
-        else
+        else if(ecuitem->interfacetype == EcuItem::INTERFACETYPE_SERIAL_DLT || ecuitem->interfacetype == EcuItem::INTERFACETYPE_SERIAL_ASCII)
         {
             /* Serial */
             if ( NULL == ecuitem->m_serialport )
@@ -3415,7 +3553,7 @@ void MainWindow::connectECU(EcuItem* ecuitem,bool force)
                 if ( NULL != ecuitem->m_serialport )
                 {
                 ecuitem->m_serialport->setBaudRate(ecuitem->getBaudrate(), QSerialPort::AllDirections);
-		ecuitem->m_serialport->setPortName(ecuitem->getPort());
+                ecuitem->m_serialport->setPortName(ecuitem->getPort());
                 ecuitem->m_serialport->setDataBits(QSerialPort::Data8);
                 ecuitem->m_serialport->setParity(QSerialPort::NoParity);
                 ecuitem->m_serialport->setStopBits(QSerialPort::OneStop);
@@ -3457,13 +3595,34 @@ void MainWindow::connectECU(EcuItem* ecuitem,bool force)
                 }
 
             }
+        } else if(ecuitem->interfacetype == EcuItem::INTERFACETYPE_ADB) {
+            qDebug() << "Connect ADB";
+            ecuitem->process.setProcessChannelMode(QProcess::MergedChannels);
+            if (ecuitem->adbId == "default" || ecuitem->adbId == "") {
+                ecuitem->process.start("adb.exe", {"logcat"});
+            } else {
+                ecuitem->process.start("adb.exe", {"-s", ecuitem->adbId, "logcat"});
+            }
+            QObject::connect(&ecuitem->process, SIGNAL(readyRead()), this, SLOT(readyRead()));
+            QObject::connect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
+            ecuitem->tryToConnect = true;
+            ecuitem->connected = true;
+            ecuitem->update();
+            on_configWidget_itemSelectionChanged();
+
+            /* reset receive buffer */
+            ecuitem->totalBytesRcvd = 0;
+            ecuitem->totalBytesRcvdLastTimeout = 0;
         }
 
-        if(  (settings->showCtId && settings->showCtIdDesc) || (settings->showApId && settings->showApIdDesc) )
-        {
-            controlMessage_GetLogInfo(ecuitem);
+        if (ecuitem->interfacetype != EcuItem::INTERFACETYPE_ADB) {
+            if(  (settings->showTid && settings->showTidDesc) || (settings->showPid && settings->showPidDesc) )
+            {
+                controlMessage_GetLogInfo(ecuitem);
+            }
         }
     }
+
     checkConnectionState();
 }
 
@@ -3676,7 +3835,7 @@ void MainWindow::readyRead()
         for(int num = 0; num < project.ecu->topLevelItemCount (); num++)
         {
             EcuItem *ecuitem = (EcuItem*)project.ecu->topLevelItem(num);
-            if( ecuitem && (ecuitem->socket == sender() || ecuitem->m_serialport == sender() || dltIndexer == sender() ) && ( true == ecuitem->connected || (ecuitem->interfacetype == EcuItem::INTERFACETYPE_UDP ) ) )
+            if( ecuitem && (ecuitem->socket == sender() || ecuitem->m_serialport == sender() || dltIndexer == sender() || ecuitem->process.isOpen()) && ( true == ecuitem->connected || (ecuitem->interfacetype == EcuItem::INTERFACETYPE_UDP ) ) )
             {
                 read(ecuitem);
             }
@@ -3788,7 +3947,12 @@ void MainWindow::read(EcuItem* ecuitem)
 
     switch (ecuitem->interfacetype)
      {
+      case EcuItem::INTERFACETYPE_ADB:
+          readAdbData(ecuitem);
+          ecuitem->ipcon.add(data);
+          break;
       case EcuItem::INTERFACETYPE_TCP:
+
           /* TCP */
           data = ecuitem->socket->readAll();
           bytesRcvd = data.size();
@@ -3864,7 +4028,7 @@ void MainWindow::read(EcuItem* ecuitem)
     /* reading data; new data is added to the current buffer */
      ecuitem->totalBytesRcvd += bytesRcvd;
 
-     while(((ecuitem->interfacetype == EcuItem::INTERFACETYPE_TCP) && ecuitem->ipcon.parseDlt(qmsg)) ||
+     while(((ecuitem->interfacetype == EcuItem::INTERFACETYPE_TCP || ecuitem->interfacetype == EcuItem::INTERFACETYPE_ADB) && ecuitem->ipcon.parseDlt(qmsg)) ||
             (ecuitem->interfacetype == EcuItem::INTERFACETYPE_SERIAL_DLT && ecuitem->serialcon.parseDlt(qmsg)) ||
             (ecuitem->interfacetype == EcuItem::INTERFACETYPE_SERIAL_ASCII && ecuitem->serialcon.parseAscii(qmsg)) )
         {
@@ -3882,7 +4046,7 @@ void MainWindow::read(EcuItem* ecuitem)
             }
         } //end while
 
-     if(ecuitem->interfacetype == EcuItem::INTERFACETYPE_TCP)
+     if(ecuitem->interfacetype == EcuItem::INTERFACETYPE_TCP || ecuitem->interfacetype == EcuItem::INTERFACETYPE_ADB)
         {
             /* TCP or UDP */
             totalByteErrorsRcvd+=ecuitem->ipcon.bytesError;
@@ -4177,6 +4341,7 @@ void MainWindow::onSearchresultsTableSelectionChanged(const QItemSelection & sel
     }
 }
 
+
 void MainWindow::controlMessage_ReceiveControlMessage(EcuItem *ecuitem, QDltMsg &msg)
 {
     const char *ptr;
@@ -4194,10 +4359,10 @@ void MainWindow::controlMessage_ReceiveControlMessage(EcuItem *ecuitem, QDltMsg 
     /* check if plugin autoload enabled and
      * it is a version message and
        version string not already parsed */
-    if(service_id == DLT_SERVICE_ID_GET_SOFTWARE_VERSION && (false == autoloadPluginsVersionEcus.contains(msg.getEcuid())))
+    if(service_id == DLT_SERVICE_ID_GET_SOFTWARE_VERSION && (false == autoloadPluginsVersionEcus.contains(msg.getTag())))
     {
         versionString(msg);
-        autoloadPluginsVersionEcus.append(msg.getEcuid());
+        autoloadPluginsVersionEcus.append(msg.getTag());
     }
 
     switch (service_id)
@@ -4223,10 +4388,10 @@ void MainWindow::controlMessage_ReceiveControlMessage(EcuItem *ecuitem, QDltMsg 
             count_app_ids=DLT_ENDIAN_GET_16(((msg.getEndianness()==QDltMsg::DltEndiannessBigEndian)?DLT_HTYP_MSBF:0), count_app_ids_tmp);
             for (int32_t num=0;num<count_app_ids;num++)
             {
-                char apid[DLT_ID_SIZE+1];
-                apid[DLT_ID_SIZE] = 0;
+                char pid[DLT_ID_SIZE+1];
+                pid[DLT_ID_SIZE] = 0;
 
-                DLT_MSG_READ_ID(apid,ptr,length);
+                DLT_MSG_READ_ID(pid,ptr,length);
 
                 uint16_t count_context_ids=0,count_context_ids_tmp=0;
                 DLT_MSG_READ_VALUE(count_context_ids_tmp,ptr,length,uint16_t);
@@ -4235,10 +4400,10 @@ void MainWindow::controlMessage_ReceiveControlMessage(EcuItem *ecuitem, QDltMsg 
                 for (int32_t num2=0;num2<count_context_ids;num2++)
                 {
                     QString contextDescription;
-                    char ctid[DLT_ID_SIZE+1];
-                    ctid[DLT_ID_SIZE] = 0;
+                    char tid[DLT_ID_SIZE+1];
+                    tid[DLT_ID_SIZE] = 0;
 
-                    DLT_MSG_READ_ID(ctid,ptr,length);
+                    DLT_MSG_READ_ID(tid,ptr,length);
 
                     int8_t log_level=0;
                     DLT_MSG_READ_VALUE(log_level,ptr,length,int8_t); /* No endian conversion necessary */
@@ -4264,7 +4429,7 @@ void MainWindow::controlMessage_ReceiveControlMessage(EcuItem *ecuitem, QDltMsg 
                         }
                     }
 
-                    controlMessage_SetContext(ecuitem,QString(apid),QString(ctid),contextDescription,log_level,trace_status);
+                    controlMessage_SetContext(ecuitem,QString(pid),QString(tid),contextDescription,log_level,trace_status);
                 }
 
                 if (status==7)
@@ -4274,7 +4439,7 @@ void MainWindow::controlMessage_ReceiveControlMessage(EcuItem *ecuitem, QDltMsg 
                     DLT_MSG_READ_VALUE(application_description_length_tmp,ptr,length,uint16_t);
                     application_description_length=DLT_ENDIAN_GET_16(((msg.getEndianness()==QDltMsg::DltEndiannessBigEndian)?DLT_HTYP_MSBF:0),application_description_length_tmp);
                     applicationDescription = QString(QByteArray((char*)ptr,application_description_length));
-                    controlMessage_SetApplication(ecuitem,QString(apid),applicationDescription);
+                    controlMessage_SetApplication(ecuitem,QString(pid),applicationDescription);
                     ptr+=application_description_length;
                 }
             }
@@ -4372,14 +4537,14 @@ void MainWindow::controlMessage_ReceiveControlMessage(EcuItem *ecuitem, QDltMsg 
             DltServiceUnregisterContext *service;
             service = (DltServiceUnregisterContext*) payload.constData();
 
-            controlMessage_UnregisterContext(msg.getEcuid(),QDltMsg::getStringFromId(service->apid),QDltMsg::getStringFromId(service->ctid));
+            controlMessage_UnregisterContext(msg.getTag(),QDltMsg::getStringFromId(service->pid),QDltMsg::getStringFromId(service->tid));
         }
         break;
     }
     } // switch
 }
 
-void MainWindow::controlMessage_SendControlMessage(EcuItem* ecuitem,DltMessage &msg, QString appid, QString contid)
+void MainWindow::controlMessage_SendControlMessage(EcuItem* ecuitem,DltMessage &msg, QString procid, QString contid)
 {
     QByteArray data;
     QDltMsg qmsg;
@@ -4409,21 +4574,21 @@ void MainWindow::controlMessage_SendControlMessage(EcuItem* ecuitem,DltMessage &
     msg.extendedheader = (DltExtendedHeader*)(msg.headerbuffer + sizeof(DltStorageHeader) + sizeof(DltStandardHeader) + DLT_STANDARD_HEADER_EXTRA_SIZE(msg.standardheader->htyp) );
     msg.extendedheader->msin = DLT_MSIN_CONTROL_REQUEST;
     msg.extendedheader->noar = 1; /* number of arguments */
-    if (appid.isEmpty())
+    if (procid.isEmpty())
     {
-        dlt_set_id(msg.extendedheader->apid,"APP");       /* application id */
+        dlt_set_id(msg.extendedheader->pid,"APP");       /* process id */
     }
     else
     {
-        dlt_set_id(msg.extendedheader->apid, appid.toLatin1());
+        dlt_set_id(msg.extendedheader->pid, procid.toLatin1());
     }
     if (contid.isEmpty())
     {
-        dlt_set_id(msg.extendedheader->ctid,"CON");       /* context id */
+        dlt_set_id(msg.extendedheader->tid,"CON");       /* thread id */
     }
     else
     {
-        dlt_set_id(msg.extendedheader->ctid, contid.toLatin1());
+        dlt_set_id(msg.extendedheader->tid, contid.toLatin1());
     }
 
     /* prepare length information */
@@ -4458,7 +4623,7 @@ void MainWindow::controlMessage_SendControlMessage(EcuItem* ecuitem,DltMessage &
     else if (ecuitem->interfacetype == EcuItem::INTERFACETYPE_SERIAL_ASCII && ecuitem->m_serialport && ecuitem->m_serialport->isOpen())
     {
         /* In SERIAL_ASCII mode we send only user input */
-        if (appid == "SER" && contid == "CON") {
+        if (procid == "SER" && contid == "CON") {
             ecuitem->m_serialport->write((const char*)(msg.databuffer+8),(msg.datasize-8));
             ecuitem->m_serialport->write("\r\n");
         }
@@ -4496,7 +4661,7 @@ void MainWindow::controlMessage_SendControlMessage(EcuItem* ecuitem,DltMessage &
     }
 }
 
-void MainWindow::controlMessage_WriteControlMessage(DltMessage &msg, QString appid, QString contid)
+void MainWindow::controlMessage_WriteControlMessage(DltMessage &msg, QString procid, QString contid)
 {
     QByteArray data;
     QDltMsg qmsg;
@@ -4526,21 +4691,21 @@ void MainWindow::controlMessage_WriteControlMessage(DltMessage &msg, QString app
     msg.extendedheader = (DltExtendedHeader*)(msg.headerbuffer + sizeof(DltStorageHeader) + sizeof(DltStandardHeader) + DLT_STANDARD_HEADER_EXTRA_SIZE(msg.standardheader->htyp) );
     msg.extendedheader->msin = DLT_MSIN_CONTROL_RESPONSE;
     msg.extendedheader->noar = 1; /* number of arguments */
-    if (appid.isEmpty())
+    if (procid.isEmpty())
     {
-        dlt_set_id(msg.extendedheader->apid,"DLTV");       /* application id */
+        dlt_set_id(msg.extendedheader->pid,"DLTV");       /* process id */
     }
     else
     {
-        dlt_set_id(msg.extendedheader->apid, appid.toLatin1());
+        dlt_set_id(msg.extendedheader->pid, procid.toLatin1());
     }
     if (contid.isEmpty())
     {
-        dlt_set_id(msg.extendedheader->ctid,"DLTV");       /* context id */
+        dlt_set_id(msg.extendedheader->tid,"DLTV");       /* thread id */
     }
     else
     {
-        dlt_set_id(msg.extendedheader->ctid, contid.toLatin1());
+        dlt_set_id(msg.extendedheader->tid, contid.toLatin1());
     }
 
     /* prepare length information */
@@ -4711,8 +4876,8 @@ void MainWindow::controlMessage_SetLogLevel(EcuItem* ecuitem, QString app, QStri
     DltServiceSetLogLevel *req;
     req = (DltServiceSetLogLevel*) msg.databuffer;
     req->service_id = DLT_SERVICE_ID_SET_LOG_LEVEL;
-    dlt_set_id(req->apid,app.toLatin1());
-    dlt_set_id(req->ctid,con.toLatin1());
+    dlt_set_id(req->pid,app.toLatin1());
+    dlt_set_id(req->tid,con.toLatin1());
     req->log_level = log_level;
     dlt_set_id(req->com,"remo");
 
@@ -4761,8 +4926,8 @@ void MainWindow::controlMessage_SetTraceStatus(EcuItem* ecuitem,QString app, QSt
     DltServiceSetLogLevel *req;
     req = (DltServiceSetLogLevel*) msg.databuffer;
     req->service_id = DLT_SERVICE_ID_SET_TRACE_STATUS;
-    dlt_set_id(req->apid,app.toLatin1());
-    dlt_set_id(req->ctid,con.toLatin1());
+    dlt_set_id(req->pid,app.toLatin1());
+    dlt_set_id(req->tid,con.toLatin1());
     req->log_level = status;
     dlt_set_id(req->com,"remo");
 
@@ -4863,8 +5028,8 @@ void MainWindow::controlMessage_GetLogInfo(EcuItem* ecuitem)
 
     req->options = 7;
 
-    dlt_set_id(req->apid, "");
-    dlt_set_id(req->ctid, "");
+    dlt_set_id(req->pid, "");
+    dlt_set_id(req->tid, "");
 
     dlt_set_id(req->com,"remo");
 
@@ -4947,18 +5112,18 @@ void MainWindow::SendInjection(EcuItem* ecuitem)
     unsigned int size = 0;
     bool ok = true;
 
-    qDebug() << "DLT SendInjection" << injectionAplicationId << injectionContextId << injectionServiceId << __LINE__;
+    qDebug() << "DLT SendInjection" << injectionAplicationId << injectionThreadId << injectionServiceId << __LINE__;
 
     if (ecuitem->interfacetype == EcuItem::INTERFACETYPE_SERIAL_ASCII)
     {
         injectionAplicationId = "SER";
-        injectionContextId    = "CON";
+        injectionThreadId    = "CON";
         injectionServiceId    = "9999";
     }
 
-    if (injectionAplicationId.isEmpty() || injectionContextId.isEmpty() || injectionServiceId.isEmpty() )
+    if (injectionAplicationId.isEmpty() || injectionThreadId.isEmpty() || injectionServiceId.isEmpty() )
     {
-        qDebug() << "Error: either APID =" << injectionAplicationId << ", CTID = "<< injectionContextId <<  "or service ID=" << injectionServiceId << "is missing";
+        qDebug() << "Error: either PID =" << injectionAplicationId << ", TID = "<< injectionThreadId <<  "or service ID=" << injectionServiceId << "is missing";
         return;
     }
 
@@ -5016,7 +5181,7 @@ void MainWindow::SendInjection(EcuItem* ecuitem)
     qDebug() << "Send" << injectionData.toUtf8() << "of size" << size << "string:" << injectionData.toUtf8() <<  "size" << injectionData.toUtf8().size();// << "LINE" << __LINE__;
 
     /* send message */
-    controlMessage_SendControlMessage(ecuitem,msg,injectionAplicationId,injectionContextId);
+    controlMessage_SendControlMessage(ecuitem,msg,injectionAplicationId,injectionThreadId);
 
     /* free message */
     dlt_message_free(&msg,0);
@@ -5143,12 +5308,12 @@ void MainWindow:: disconnectAllEcuSignal()
     disconnectAll();
 }
 
-void MainWindow::sendInjection(int index,QString applicationId,QString contextId,int serviceId,QByteArray data)
+void MainWindow::sendInjection(int index,QString processId,QString threadId,int serviceId,QByteArray data)
 {
     EcuItem* ecuitem = (EcuItem*) project.ecu->topLevelItem(index);
 
-    injectionAplicationId = applicationId;
-    injectionContextId = contextId;
+    injectionAplicationId = processId;
+    injectionThreadId = threadId;
 
     if(ecuitem)
     {
@@ -5180,7 +5345,7 @@ void MainWindow::sendInjection(int index,QString applicationId,QString contextId
             memcpy(msg.databuffer+8, data.constData(), data.size());
 
             /* send message */
-            controlMessage_SendControlMessage(ecuitem,msg,injectionAplicationId,injectionContextId);
+            controlMessage_SendControlMessage(ecuitem,msg,injectionAplicationId,injectionThreadId);
 
             /* free message */
             dlt_message_free(&msg,0);
@@ -5211,18 +5376,18 @@ void MainWindow::on_action_menuDLT_Send_Injection_triggered()
 
         if(conitem)
         {
-            dlg.setApplicationId(appitem->id);
-            dlg.setContextId(conitem->id);
+            dlg.setProcessId(appitem->id);
+            dlg.setThreadId(conitem->id);
         }
         else if(appitem)
         {
-            dlg.setApplicationId(appitem->id);
-            dlg.setContextId(injectionContextId);
+            dlg.setProcessId(appitem->id);
+            dlg.setThreadId(injectionThreadId);
         }
         else
         {
-            dlg.setApplicationId(injectionAplicationId);
-            dlg.setContextId(injectionContextId);
+            dlg.setProcessId(injectionAplicationId);
+            dlg.setThreadId(injectionThreadId);
         }
         dlg.setServiceId(injectionServiceId);
         dlg.setData(injectionData);
@@ -5230,8 +5395,8 @@ void MainWindow::on_action_menuDLT_Send_Injection_triggered()
 
         if(dlg.exec())
         {
-            injectionAplicationId = dlg.getApplicationId();
-            injectionContextId = dlg.getContextId();
+            injectionAplicationId = dlg.getProcessId();
+            injectionThreadId = dlg.getThreadId();
             injectionServiceId = dlg.getServiceId();
             injectionData = dlg.getData();
             injectionDataBinary = dlg.getDataBinary();
@@ -5246,14 +5411,14 @@ void MainWindow::on_action_menuDLT_Send_Injection_triggered()
     //                         QString("No ECU selected in configuration!"));
 }
 
-void MainWindow::controlMessage_SetApplication(EcuItem *ecuitem, QString apid, QString appdescription)
+void MainWindow::controlMessage_SetApplication(EcuItem *ecuitem, QString pid, QString appdescription)
 {
     /* Try to find App */
     for(int numapp = 0; numapp < ecuitem->childCount(); numapp++)
     {
         ApplicationItem * appitem = (ApplicationItem *) ecuitem->child(numapp);
 
-        if(appitem->id == apid)
+        if(appitem->id == pid)
         {
             appitem->description = appdescription;
             appitem->update();
@@ -5263,17 +5428,17 @@ void MainWindow::controlMessage_SetApplication(EcuItem *ecuitem, QString apid, Q
 
     /* No app and no con found */
     ApplicationItem* appitem = new ApplicationItem(ecuitem);
-    appitem->id = apid;
+    appitem->id = pid;
     appitem->description = appdescription;
     appitem->update();
     ecuitem->addChild(appitem);
 
 }
 
-void MainWindow::controlMessage_SetContext(EcuItem *ecuitem, QString apid, QString ctid,QString ctdescription,int log_level,int trace_status)
+void MainWindow::controlMessage_SetContext(EcuItem *ecuitem, QString pid, QString tid,QString ctdescription,int log_level,int trace_status)
 {
     /* First try to find existing context */
-    //qDebug() << "New CTX for" << apid << ctid << ctdescription;
+    //qDebug() << "New CTX for" << pid << tid << ctdescription;
 
     for(int numapp = 0; numapp < ecuitem->childCount(); numapp++)
     {
@@ -5283,7 +5448,7 @@ void MainWindow::controlMessage_SetContext(EcuItem *ecuitem, QString apid, QStri
         {
             ContextItem * conitem = (ContextItem *) appitem->child(numcontext);
 
-            if(appitem->id == apid && conitem->id == ctid)
+            if(appitem->id == pid && conitem->id == tid)
             {
                 /* set new log level and trace status */
                 conitem->loglevel = log_level;
@@ -5301,11 +5466,11 @@ void MainWindow::controlMessage_SetContext(EcuItem *ecuitem, QString apid, QStri
     {
         ApplicationItem * appitem = (ApplicationItem *) ecuitem->child(numapp);
 
-        if(appitem->id == apid)
+        if(appitem->id == pid)
         {
             /* Add new context */
             ContextItem* conitem = new ContextItem(appitem);
-            conitem->id = ctid;
+            conitem->id = tid;
             conitem->loglevel = log_level;
             conitem->tracestatus = trace_status;
             conitem->description = ctdescription;
@@ -5319,12 +5484,12 @@ void MainWindow::controlMessage_SetContext(EcuItem *ecuitem, QString apid, QStri
 
     /* No app and no con found */
     ApplicationItem* appitem = new ApplicationItem(ecuitem);
-    appitem->id = apid;
+    appitem->id = pid;
     appitem->description = QString("");
     appitem->update();
     ecuitem->addChild(appitem);
     ContextItem* conitem = new ContextItem(appitem);
-    conitem->id = ctid;
+    conitem->id = tid;
     conitem->loglevel = log_level;
     conitem->tracestatus = trace_status;
     conitem->description = ctdescription;
@@ -5342,7 +5507,7 @@ void MainWindow::controlMessage_Timezone(int timezone, unsigned char dst)
     }
 }
 
-void MainWindow::controlMessage_UnregisterContext(QString ecuId,QString appId,QString ctId)
+void MainWindow::controlMessage_UnregisterContext(QString tag,QString procId,QString tid)
 {
     if(!project.settings->updateContextsUnregister)
         return;
@@ -5352,7 +5517,7 @@ void MainWindow::controlMessage_UnregisterContext(QString ecuId,QString appId,QS
     for(int num = 0; num < project.ecu->topLevelItemCount (); num++)
     {
         EcuItem *ecuitem = (EcuItem*)project.ecu->topLevelItem(num);
-        if(ecuitem->id == ecuId)
+        if(ecuitem->id == tag)
         {
             ecuitemFound = ecuitem;
             break;
@@ -5371,7 +5536,7 @@ void MainWindow::controlMessage_UnregisterContext(QString ecuId,QString appId,QS
         {
             ContextItem * conitem = (ContextItem *) appitem->child(numcontext);
 
-            if(appitem->id == appId && conitem->id == ctId)
+            if(appitem->id == procId && conitem->id == tid)
             {
                 /* remove context */
                 delete conitem->parent()->takeChild(conitem->parent()->indexOfChild(conitem));
@@ -6466,12 +6631,12 @@ void MainWindow::filterAddTable() {
 
     /* show filter dialog */
     FilterDialog dlg;
-    dlg.setEnableEcuId(!msg.getEcuid().isEmpty());
-    dlg.setEcuId(msg.getEcuid());
-    dlg.setEnableApplicationId(!msg.getApid().isEmpty());
-    dlg.setApplicationId(msg.getApid());
-    dlg.setEnableContextId(!msg.getCtid().isEmpty());
-    dlg.setContextId(msg.getCtid());
+    dlg.setEnabletag(!msg.getTag().isEmpty());
+    dlg.settag(msg.getTag());
+    dlg.setEnableProcessId(!msg.getPid().isEmpty());
+    dlg.setProcessId(msg.getPid());
+    dlg.setEnableThreadId(!msg.getTid().isEmpty());
+    dlg.setThreadId(msg.getTid());
     dlg.setHeaderText(msg.toStringHeader());
     dlg.setPayloadText(msg.toStringPayload());
     dlg.setMessageId_min(msg.getMessageId());
@@ -6513,20 +6678,20 @@ void MainWindow::filterAdd()
 
     if(ecuitem)
     {
-        dlg.setEnableEcuId(true);
-        dlg.setEcuId(ecuitem->id);
+        dlg.setEnabletag(true);
+        dlg.settag(ecuitem->id);
     }
 
     if(appitem)
     {
-        dlg.setEnableApplicationId(true);
-        dlg.setApplicationId(appitem->id);
+        dlg.setEnableProcessId(true);
+        dlg.setProcessId(appitem->id);
     }
 
     if(conitem)
     {
-        dlg.setEnableContextId(true);
-        dlg.setContextId(conitem->id);
+        dlg.setEnableThreadId(true);
+        dlg.setThreadId(conitem->id);
     }
 
     if(dlg.exec()==1) {
@@ -6579,9 +6744,9 @@ void MainWindow::filterDialogWrite(FilterDialog &dlg,FilterItem* item)
     dlg.setType((int)(item->filter.type));
 
     dlg.setName(item->filter.name);
-    dlg.setEcuId(item->filter.ecuid);
-    dlg.setApplicationId(item->filter.apid);
-    dlg.setContextId(item->filter.ctid);
+    dlg.settag(item->filter.tag);
+    dlg.setProcessId(item->filter.pid);
+    dlg.setThreadId(item->filter.tid);
     dlg.setHeaderText(item->filter.header);
     dlg.setPayloadText(item->filter.payload);
     dlg.setRegexSearchText(item->filter.regex_search);
@@ -6594,16 +6759,16 @@ void MainWindow::filterDialogWrite(FilterDialog &dlg,FilterItem* item)
     dlg.setLogLevelMax(item->filter.logLevelMax);
     dlg.setLogLevelMin(item->filter.logLevelMin);
 
-    dlg.setEnableRegexp_Appid(item->filter.enableRegexp_Appid);
+    dlg.setEnableRegexp_Procid(item->filter.enableRegexp_Procid);
     dlg.setEnableRegexp_Context(item->filter.enableRegexp_Context);
     dlg.setEnableRegexp_Header (item->filter.enableRegexp_Header);
     dlg.setEnableRegexp_Payload(item->filter.enableRegexp_Payload);
     dlg.setIgnoreCase_Header(item->filter.ignoreCase_Header);
     dlg.setIgnoreCase_Payload(item->filter.ignoreCase_Payload);
     dlg.setActive(item->filter.enableFilter);
-    dlg.setEnableEcuId(item->filter.enableEcuid);
-    dlg.setEnableApplicationId(item->filter.enableApid);
-    dlg.setEnableContextId(item->filter.enableCtid);
+    dlg.setEnabletag(item->filter.enableTag);
+    dlg.setEnableProcessId(item->filter.enablePid);
+    dlg.setEnableThreadId(item->filter.enableTid);
     dlg.setEnableHeaderText(item->filter.enableHeader);
     dlg.setEnablePayloadText(item->filter.enablePayload);
     dlg.setEnableCtrlMsgs(item->filter.enableCtrlMsgs);
@@ -6626,24 +6791,24 @@ void MainWindow::filterDialogRead(FilterDialog &dlg,FilterItem* item)
 
     item->filter.name = dlg.getName();
 
-    item->filter.ecuid = dlg.getEcuId();
-    item->filter.apid = dlg.getApplicationId();
-    item->filter.ctid = dlg.getContextId();
+    item->filter.tag = dlg.gettag();
+    item->filter.pid = dlg.getProcessId();
+    item->filter.tid = dlg.getThreadId();
     item->filter.header = dlg.getHeaderText();
     item->filter.payload = dlg.getPayloadText();
     item->filter.regex_search = dlg.getRegexSearchText();
     item->filter.regex_replace = dlg.getRegexReplaceText();
 
-    item->filter.enableRegexp_Appid = dlg.getEnableRegexp_Appid();
+    item->filter.enableRegexp_Procid = dlg.getEnableRegexp_Procid();
     item->filter.enableRegexp_Context = dlg.getEnableRegexp_Context();
     item->filter.enableRegexp_Header = dlg.getEnableRegexp_Header();
     item->filter.enableRegexp_Payload = dlg.getEnableRegexp_Payload();
     item->filter.ignoreCase_Header = dlg.getIgnoreCase_Header();
     item->filter.ignoreCase_Payload = dlg.getIgnoreCase_Payload();
     item->filter.enableFilter = dlg.getEnableActive();
-    item->filter.enableEcuid = dlg.getEnableEcuId();
-    item->filter.enableApid = dlg.getEnableApplicationId();
-    item->filter.enableCtid = dlg.getEnableContextId();
+    item->filter.enableTag = dlg.getEnabletag();
+    item->filter.enablePid = dlg.getEnableProcessId();
+    item->filter.enableTid = dlg.getEnableThreadId();
     item->filter.enableHeader = dlg.getEnableHeaderText();
     item->filter.enablePayload = dlg.getEnablePayloadText();
     item->filter.enableCtrlMsgs = dlg.getEnableCtrlMsgs();
@@ -6866,7 +7031,7 @@ void MainWindow::filterUpdate()
             }
         }
 
-        if(filter->enableRegexp_Appid || filter->enableRegexp_Context || filter->enableRegexp_Header || filter->enableRegexp_Payload)
+        if(filter->enableRegexp_Procid || filter->enableRegexp_Context || filter->enableRegexp_Header || filter->enableRegexp_Payload)
         {
             if(false == filter->compileRegexps())
             {
@@ -7382,7 +7547,7 @@ void MainWindow::on_action_menuConfig_Collapse_All_ECUs_triggered()
 
 void MainWindow::on_action_menuConfig_Save_All_ECUs_triggered()
 {
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save DLT Filters"), workingDirectory.getDltDirectory(), tr("Save APID/CTID list (*.csv);;All files (*.*)"));
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save DLT Filters"), workingDirectory.getDltDirectory(), tr("Save PID/TID list (*.csv);;All files (*.*)"));
     QFile asciiFile(filename);
     asciiFile.open(QIODevice::WriteOnly);
 
@@ -7393,12 +7558,12 @@ void MainWindow::on_action_menuConfig_Save_All_ECUs_triggered()
         if ( NULL == ecuitem)
             return;
         asciiFile.write(QString("ECU;%1\n").arg(ecuitem->id).toLatin1().constData());
-        // go over APIDs
+        // go over PIDs
         for(int numapp = 0; numapp < ecuitem->childCount(); numapp++)
         {
             ApplicationItem * appitem = (ApplicationItem *) ecuitem->child(numapp);
             asciiFile.write(QString("%1;;%2\n").arg(appitem->id).arg(appitem->description).toLatin1().constData());
-            // go over CTIDs
+            // go over TIDs
             for(int numcontext = 0; numcontext < appitem->childCount(); numcontext++)
             {
                 ContextItem * conitem = (ContextItem *) appitem->child(numcontext);
@@ -7533,12 +7698,12 @@ bool MainWindow::jump_to_line(int line)
         column = FieldNames::TimeStamp;
     else if(project.settings->showCount == 1)
         column = FieldNames::Counter;
-    else if(project.settings->showEcuId == 1)
-        column = FieldNames::EcuId;
-    else if(project.settings->showApId == 1)
-        column = FieldNames::AppId;
-    else if(project.settings->showCtId == 1)
-        column = FieldNames::ContextId;
+    else if(project.settings->showtag == 1)
+        column = FieldNames::tag;
+    else if(project.settings->showPid == 1)
+        column = FieldNames::ProcId;
+    else if(project.settings->showTid == 1)
+        column = FieldNames::ThreadId;
     else if(project.settings->showSessionId == 1)
         column = FieldNames::SessionId;
     else if(project.settings->showArguments == 1)

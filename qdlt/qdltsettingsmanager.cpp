@@ -118,13 +118,13 @@ void QDltSettingsManager::writeSettingsLocal(QXmlStreamWriter &xml)
             xml.writeTextElement("showTime",QString("%1").arg(showTime));
             xml.writeTextElement("showTimestamp",QString("%1").arg(showTimestamp));
             xml.writeTextElement("showCount",QString("%1").arg(showCount));
-            xml.writeTextElement("showEcuId",QString("%1").arg(showEcuId));
-            xml.writeTextElement("showApId",QString("%1").arg(showApId));
-            xml.writeTextElement("showApIdDesc",QString("%1").arg(showApIdDesc));
-            xml.writeTextElement("showCtId",QString("%1").arg(showCtId));
-            xml.writeTextElement("showCtIdDesc",QString("%1").arg(showCtIdDesc));
+            xml.writeTextElement("showtag",QString("%1").arg(showtag));
+            xml.writeTextElement("showPid",QString("%1").arg(showPid));
+            xml.writeTextElement("showPidDesc",QString("%1").arg(showPidDesc));
+            xml.writeTextElement("showTid",QString("%1").arg(showTid));
+            xml.writeTextElement("showTidDesc",QString("%1").arg(showTidDesc));
             xml.writeTextElement("showType",QString("%1").arg(showType));
-            xml.writeTextElement("showSubtype",QString("%1").arg(showSubtype));
+            xml.writeTextElement("showLogLevel",QString("%1").arg(showLogLevel));
             xml.writeTextElement("showMode",QString("%1").arg(showMode));
             xml.writeTextElement("showNoar",QString("%1").arg(showNoar));
             xml.writeTextElement("showPayload",QString("%1").arg(showPayload));
@@ -204,16 +204,16 @@ void QDltSettingsManager::writeSettings()
     settings->setValue("startup/showTimestamp",showTimestamp);
     settings->setValue("startup/showCount",showCount);
 
-    settings->setValue("startup/showEcuId",showEcuId);
-    settings->setValue("startup/showApId",showApId);
-    settings->setValue("startup/showApIdDesc",showApIdDesc);
-    settings->setValue("startup/showCtId",showCtId);
-    settings->setValue("startup/showCtIdDesc",showCtIdDesc);
+    settings->setValue("startup/showtag",showtag);
+    settings->setValue("startup/showPid",showPid);
+    settings->setValue("startup/showPidDesc",showPidDesc);
+    settings->setValue("startup/showTid",showTid);
+    settings->setValue("startup/showTidDesc",showTidDesc);
     settings->setValue("startup/showSessionId",showSessionId);
     settings->setValue("startup/showSessionName",showSessionName);
     settings->setValue("startup/showType",showType);
 
-    settings->setValue("startup/showSubtype",showSubtype);
+    settings->setValue("startup/showLogLevel",showLogLevel);
     settings->setValue("startup/showMode",showMode);
     settings->setValue("startup/showNoar",showNoar);
     settings->setValue("startup/showPayload",showPayload);
@@ -302,25 +302,25 @@ void QDltSettingsManager::readSettingsLocal(QXmlStreamReader &xml)
     {
         showCount = xml.readElementText().toInt();
     }
-    if(xml.name() == QString("showEcuId"))
+    if(xml.name() == QString("showtag"))
     {
-        showEcuId = xml.readElementText().toInt();
+        showtag = xml.readElementText().toInt();
     }
-    if(xml.name() == QString("showApId"))
+    if(xml.name() == QString("showPid"))
     {
-        showApId = xml.readElementText().toInt();
+        showPid = xml.readElementText().toInt();
     }
-    if(xml.name() == QString("showApIdDesc"))
+    if(xml.name() == QString("showPidDesc"))
     {
-        showApIdDesc = xml.readElementText().toInt();
+        showPidDesc = xml.readElementText().toInt();
     }
-    if(xml.name() == QString("showCtId"))
+    if(xml.name() == QString("showTid"))
     {
-        showCtId = xml.readElementText().toInt();
+        showTid = xml.readElementText().toInt();
     }
-    if(xml.name() == QString("showCtIdDesc"))
+    if(xml.name() == QString("showTidDesc"))
     {
-        showCtIdDesc = xml.readElementText().toInt();
+        showTidDesc = xml.readElementText().toInt();
     }
     if(xml.name() == QString("showSessionId"))
     {
@@ -334,9 +334,9 @@ void QDltSettingsManager::readSettingsLocal(QXmlStreamReader &xml)
     {
         showType = xml.readElementText().toInt();
     }
-    if(xml.name() == QString("showSubtype"))
+    if(xml.name() == QString("showLogLevel"))
     {
-        showSubtype = xml.readElementText().toInt();
+        showLogLevel = xml.readElementText().toInt();
     }
     if(xml.name() == QString("showMode"))
     {
@@ -447,19 +447,19 @@ void QDltSettingsManager::readSettings()
 
     showIndex = settings->value("startup/showIndex",1).toInt();
     showTime = settings->value("startup/showTime",1).toInt();
-    showTimestamp = settings->value("startup/showTimestamp",1).toInt();
+    showTimestamp = settings->value("startup/showTimestamp",0).toInt();
     showCount = settings->value("startup/showCount",0).toInt();
 
-    showEcuId = settings->value("startup/showEcuId",1).toInt();
-    showApId = settings->value("startup/showApId",1).toInt();
-    showApIdDesc = settings->value("startup/showApIdDesc",0).toInt();
-    showCtId = settings->value("startup/showCtId",1).toInt();
-    showCtIdDesc = settings->value("startup/showCtIdDesc",0).toInt();
+    showtag = settings->value("startup/showtag",1).toInt();
+    showPid = settings->value("startup/showPid",1).toInt();
+    showPidDesc = settings->value("startup/showPidDesc",0).toInt();
+    showTid = settings->value("startup/showTid",1).toInt();
+    showTidDesc = settings->value("startup/showTidDesc",0).toInt();
     showSessionId = settings->value("startup/showSessionId",0).toInt();
     showSessionName = settings->value("startup/showSessionName",0).toInt();
-    showType = settings->value("startup/showType",1).toInt();
+    showType = settings->value("startup/showType",0).toInt();
 
-    showSubtype = settings->value("startup/showSubtype",0).toInt();
+    showLogLevel = settings->value("startup/showLogLevel",1).toInt();
 
     showMode = settings->value("startup/showMode",0).toInt();
     showNoar = settings->value("startup/showNoar",0).toInt();

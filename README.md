@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Diagnostic Log and Trace Viewer is an application that can send and receive control messages to the DLT daemon, e.g. to set individual log levels of applications and contexts or get the list of applications and contexts registered in the DLT daemon. DLT viewer is based on Qt for Windows and Linux and can run on the Mac though that is not officially supported.
+The Diagnostic Log Tool For Android ADB Device.
 
 ## Documentation
 
@@ -50,21 +50,9 @@ License
 Full information on the license for this software is available in the "LICENSE.txt" file.
 
 ## Source Code for DLT Viewer (This repository)
+https://github.com/WinvicWang/dlt-viewer-for-adb
+This repo is developed based on the repo https://github.com/COVESA/dlt-viewer, the license should follow Mozilla Public License, v. 2.0
 
-https://github.com/COVESA/dlt-viewer 
 
-## Homepage
 
-[Diagnostic Log and Trace Homepage](https://github.com/COVESA/dlt-viewer) on Github
 
-## Issues and questions
-
-[Diagnostic Log and Trace Homepage Issues](https://github.com/COVESA/dlt-viewer/issues)
-
-## Additional Plugins
-
-https://github.com/svlad-90/DLT-Message-Analyzer
-
-## Contact
-
-Alexander Wenzel Alexander.AW.Wenzel@bmw.de and Gernot Wirschal Gernot.Wirschal@bmw.de

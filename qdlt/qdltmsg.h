@@ -166,41 +166,41 @@ public:
     */
     void setMessageCounter(unsigned char _messageCounter) { messageCounter = _messageCounter; }
 
-    //! Get the ecu id of the DLT message.
+    //! Get the tag of the DLT message.
     /*!
-      \return The ecu id of the DLT message.
+      \return The tag of the DLT message.
     */
-    QString getEcuid() const { return ecuid; }
+    QString getTag() const { return tag; }
 
-    //! Set the ecu id of the DLT message.
+    //! Set the tag of the DLT message.
     /*!
-      \param _ecuid The ecu id of the DLT message.
+      \param _tag The tag of the DLT message.
     */
-    void setEcuid(QString _ecuid) { ecuid = _ecuid; }
+    void setTag(QString _tag) { tag = _tag; }
 
-    //! Get the application id of the DLT message.
+    //! Get the process id of the DLT message.
     /*!
-      \return The application id.
+      \return The process id.
     */
-    QString getApid() const { return apid; }
+    QString getPid() const { return pid; }
 
-    //! Set the application id of the DLT message.
+    //! Set the process id of the DLT message.
     /*!
-      \param id The application id.
+      \param id The process id.
     */
-    void setApid(QString id) { apid = id; }
+    void setPid(QString id) { pid = id; }
 
-    //! Get the context id of the DLT message.
+    //! Get the thread id of the DLT message.
     /*!
       \return The contex id.
     */
-    QString getCtid() const { return ctid; }
+    QString getTid() const { return tid; }
 
-    //! Set the context id of the DLT message.
+    //! Set the thread id of the DLT message.
     /*!
-      \param id The context id.
+      \param id The thread id.
     */
-    void setCtid(QString id) { ctid = id; }
+    void setTid(QString id) { tid = id; }
 
     //! Get the type of the DLT message.
     /*!
@@ -481,11 +481,11 @@ public:
     bool getWithSessionId() const;
     void setWithSessionId(bool newWithSessionId);
 
-    bool getWithAppContextId() const;
-    void setWithAppContextId(bool newWithAppContextId);
+    bool getWithAppThreadId() const;
+    void setWithAppThreadId(bool newWithAppThreadId);
 
-    bool getWithEcuId() const;
-    void setWithEcuId(bool newWithEcuId);
+    bool getWithtag() const;
+    void setWithtag(bool newWithtag);
 
     quint8 getContentInformation() const;
     void setContentInformation(quint8 newContentInformation);
@@ -551,14 +551,14 @@ protected:
 
 private:
 
-    //! The header parameter ECU Id.
-    QString ecuid;
+    //! The header parameter Tag.
+    QString tag;
 
-    //! The header parameter application Id.
-    QString apid;
+    //! The header parameter Process ID.
+    QString pid;
 
-    //! The header parameter context Id.
-    QString ctid;
+    //! The header parameter thread Id.
+    QString tid;
 
     //! The header parameter type of the message.
     DltTypeDef type;
@@ -616,8 +616,8 @@ private:
     //! New parameters of DLTv2 protocol
     uint8_t versionNumber;
     bool withSessionId;
-    bool withAppContextId;
-    bool withEcuId;
+    bool withAppThreadId;
+    bool withtag;
     quint8 contentInformation; // 0x0 = verbose, 0x1 = non verbose, 0x2 = control
     bool withHFMessageInfo; // verbose or control
     bool withHFNumberOfArguments; // verbose or control

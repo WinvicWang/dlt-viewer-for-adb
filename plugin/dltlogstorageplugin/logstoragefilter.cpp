@@ -27,9 +27,9 @@ LogstorageFilter::LogstorageFilter()
 
 }
 
-LogstorageFilter::LogstorageFilter(QString apid, QString ctid, QString logLevel, QString fileName, unsigned int fileSize, unsigned int noFiles) :
-    m_apid(apid),
-    m_ctid(ctid),
+LogstorageFilter::LogstorageFilter(QString pid, QString tid, QString logLevel, QString fileName, unsigned int fileSize, unsigned int noFiles) :
+    m_pid(pid),
+    m_tid(tid),
     m_logLevel(logLevel),
     m_fileName(fileName),
     m_fileSize(fileSize),
@@ -40,8 +40,8 @@ LogstorageFilter::LogstorageFilter(QString apid, QString ctid, QString logLevel,
 
 QString LogstorageFilter::toText()
 {
-    return QString("LogAppName=" + m_apid + "\n" +
-                   "ContextName=" + m_ctid + "\n" +
+    return QString("LogAppName=" + m_pid + "\n" +
+                   "ContextName=" + m_tid + "\n" +
                    "LogLevel=" + m_logLevel + "\n" +
                    "File=" + m_fileName + "\n" +
                    "FileSize=" + QString::number(m_fileSize) + "\n" +

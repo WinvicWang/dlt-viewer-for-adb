@@ -22,13 +22,13 @@
 
 #include "qdltsettingsmanager.h"
 
-InjectionDialog::InjectionDialog(QString appid,QString conid,QWidget *parent) :
+InjectionDialog::InjectionDialog(QString procid,QString conid,QWidget *parent) :
     QDialog(parent),
     ui(new Ui::InjectionDialog)
 {
     ui->setupUi(this);
-    ui->applicationidComboBox->setEditText(appid);
-    ui->contextidComboBox->setEditText(conid);
+    ui->processidComboBox->setEditText(procid);
+    ui->threadidComboBox->setEditText(conid);
 }
 
 InjectionDialog::~InjectionDialog()
@@ -48,14 +48,14 @@ void InjectionDialog::changeEvent(QEvent *e)
     }
 }
 
-void InjectionDialog::setApplicationId(QString text) { ui->applicationidComboBox->setEditText(text); }
-void InjectionDialog::setContextId(QString text) { ui->contextidComboBox->setEditText(text); }
+void InjectionDialog::setProcessId(QString text) { ui->processidComboBox->setEditText(text); }
+void InjectionDialog::setThreadId(QString text) { ui->threadidComboBox->setEditText(text); }
 void InjectionDialog::setServiceId(QString text) { ui->serviceidComboBox->setEditText(text); }
 void InjectionDialog::setData(QString text) { ui->dataComboBox->setEditText(text); }
 void InjectionDialog::setDataBinary(bool mode) { ui->binaryRadioButton->setChecked(mode);ui->textRadioButton->setChecked(!mode); }
 
-QString InjectionDialog::getApplicationId() { return ui->applicationidComboBox->currentText(); }
-QString InjectionDialog::getContextId() { return ui->contextidComboBox->currentText(); }
+QString InjectionDialog::getProcessId() { return ui->processidComboBox->currentText(); }
+QString InjectionDialog::getThreadId() { return ui->threadidComboBox->currentText(); }
 QString InjectionDialog::getServiceId() { return ui->serviceidComboBox->currentText(); }
 QString InjectionDialog::getData() { return ui->dataComboBox->currentText(); }
 bool InjectionDialog::getDataBinary() { return ui->binaryRadioButton->isChecked(); }
@@ -63,15 +63,15 @@ bool InjectionDialog::getDataBinary() { return ui->binaryRadioButton->isChecked(
 void InjectionDialog::updateHistory()
 {
     QStringList list;
-    list = QDltSettingsManager::getInstance()->value("injection/applicationid").toStringList();
-    ui->applicationidComboBox->clear();
+    list = QDltSettingsManager::getInstance()->value("injection/processid").toStringList();
+    ui->processidComboBox->clear();
     foreach(QString text,list)
-       ui->applicationidComboBox->addItem(text);
+       ui->processidComboBox->addItem(text);
 
-    list = QDltSettingsManager::getInstance()->value("injection/contextid").toStringList();
-    ui->contextidComboBox->clear();
+    list = QDltSettingsManager::getInstance()->value("injection/threadid").toStringList();
+    ui->threadidComboBox->clear();
     foreach(QString text,list)
-       ui->contextidComboBox->addItem(text);
+       ui->threadidComboBox->addItem(text);
 
     list = QDltSettingsManager::getInstance()->value("injection/serviceid").toStringList();
     ui->serviceidComboBox->clear();
@@ -89,19 +89,19 @@ void InjectionDialog::storeHistory()
 {
     QStringList list;
 
-    list = QDltSettingsManager::getInstance()->value("injection/applicationid").toStringList();
-    list.removeAll(getApplicationId());
-    list.prepend(getApplicationId());
+    list = QDltSettingsManager::getInstance()->value("injection/processid").toStringList();
+    list.removeAll(getProcessId());
+    list.prepend(getProcessId());
     while (list.size() > INJECTION_MAX_HISTORY)
         list.removeLast();
-    QDltSettingsManager::getInstance()->setValue("injection/applicationid",list);
+    QDltSettingsManager::getInstance()->setValue("injection/processid",list);
 
-    list = QDltSettingsManager::getInstance()->value("injection/contextid").toStringList();
-    list.removeAll(getContextId());
-    list.prepend(getContextId());
+    list = QDltSettingsManager::getInstance()->value("injection/threadid").toStringList();
+    list.removeAll(getThreadId());
+    list.prepend(getThreadId());
     while (list.size() > INJECTION_MAX_HISTORY)
         list.removeLast();
-    QDltSettingsManager::getInstance()->setValue("injection/contextid",list);
+    QDltSettingsManager::getInstance()->setValue("injection/threadid",list);
 
     list = QDltSettingsManager::getInstance()->value("injection/serviceid").toStringList();
     list.removeAll(getServiceId());

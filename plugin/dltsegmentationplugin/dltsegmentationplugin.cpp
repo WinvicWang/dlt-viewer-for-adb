@@ -170,8 +170,8 @@ bool DltSegmentationPlugin::decodeMsg(QDltMsg &msg, int triggeredByUser)
         {
             // find position in array
             int index = msg.getIndex();
-            QString appId = msg.getApid();
-            QString ctxId = msg.getCtid();
+            QString procId = msg.getPid();
+            QString ctxId = msg.getTid();
             int lastIndex = segmentedMessages.indexOf(index);
             QByteArray payload = msg.getPayload();
             int consecutiveFrame=-1;
@@ -181,7 +181,7 @@ bool DltSegmentationPlugin::decodeMsg(QDltMsg &msg, int triggeredByUser)
             {
                 QDltMsg msgChunk;
                 dltFile->getMsg(segmentedMessages[num],msgChunk);
-                if(msgChunk.getApid()==appId && msgChunk.getCtid()==ctxId)
+                if(msgChunk.getPid()==procId && msgChunk.getTid()==ctxId)
                 {
                     if(msgChunk.getSegmentationFrameType()==1)
                     {

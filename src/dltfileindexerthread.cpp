@@ -68,7 +68,7 @@ void DltFileIndexerThread::processMessage(QSharedPointer<QDltMsg> &msg, int inde
         QByteArray data = payload.mid(9, (payload.size() > 262) ? 256 : (payload.size() - 9));
         QString version = msg->toAscii(data,true);
         version = version.trimmed(); // remove all white spaces at beginning and end
-        indexer->versionString(msg->getEcuid(),version);
+        indexer->versionString(msg->getTag(),version);
     }
 
     /* check if it is a timezone message */
@@ -102,7 +102,7 @@ void DltFileIndexerThread::processMessage(QSharedPointer<QDltMsg> &msg, int inde
             DltServiceUnregisterContext *service;
             service = (DltServiceUnregisterContext *) payload.constData();
 
-            indexer->unregisterContext(msg->getEcuid(), QDltMsg::getStringFromId(service->apid), QDltMsg::getStringFromId(service->ctid));
+            indexer->unregisterContext(msg->getTag(), QDltMsg::getStringFromId(service->pid), QDltMsg::getStringFromId(service->tid));
         }
     }
 

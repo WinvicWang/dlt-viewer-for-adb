@@ -60,7 +60,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QLineEdit" name="lineEditApplicationId">
+    <widget class="QLineEdit" name="lineEditProcessId">
      <property name="text">
       <string>LOG</string>
      </property>
@@ -81,7 +81,7 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QLineEdit" name="lineEditContextId">
+    <widget class="QLineEdit" name="lineEditThreadId">
      <property name="text">
       <string>TEST</string>
      </property>
@@ -114,7 +114,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>ContextId:</string>
+      <string>ThreadId:</string>
      </property>
     </widget>
    </item>
@@ -128,7 +128,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>ApplicationId:</string>
+      <string>ProcessId:</string>
      </property>
     </widget>
    </item>

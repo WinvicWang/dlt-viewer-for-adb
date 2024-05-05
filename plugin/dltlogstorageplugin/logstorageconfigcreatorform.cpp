@@ -45,14 +45,14 @@ LogstorageConfigCreatorForm::LogstorageConfigCreatorForm(QWidget *parent) :
 
     // define some basic lineEdit validators
 #ifdef QT5_QT6_COMPAT
-    ui->lineEdit_apid->setValidator(new QRegularExpressionValidator( QRegularExpression("[a-zA-Z0-9_,]{0,20}$|[.]{1}[*]{1}"), 0));
-    ui->lineEdit_ctid->setValidator(new QRegularExpressionValidator( QRegularExpression("[a-zA-Z0-9_,]{0,20}$|[.]{1}[*]{1}"), 0));
+    ui->lineEdit_pid->setValidator(new QRegularExpressionValidator( QRegularExpression("[a-zA-Z0-9_,]{0,20}$|[.]{1}[*]{1}"), 0));
+    ui->lineEdit_tid->setValidator(new QRegularExpressionValidator( QRegularExpression("[a-zA-Z0-9_,]{0,20}$|[.]{1}[*]{1}"), 0));
     ui->lineEdit_fname->setValidator(new QRegularExpressionValidator( QRegularExpression("[a-zA-Z0-9_-]\\S{0,20}$"), 0));
     ui->lineEdit_fsize->setValidator( new QRegularExpressionValidator( QRegularExpression("[1-9]\\d{0,7}$"), 0));
     ui->lineEdit_nofiles->setValidator( new QRegularExpressionValidator( QRegularExpression("[1-9]\\d{0,2}$"), 0));
 #else
-    ui->lineEdit_apid->setValidator(new QRegularExpressionValidator( QRegularExpression("[a-zA-Z0-9_,]{0,20}$|[.]{1}[*]{1}"), 0));
-    ui->lineEdit_ctid->setValidator(new QRegularExpressionValidator( QRegularExpression("[a-zA-Z0-9_,]{0,20}$|[.]{1}[*]{1}"), 0));
+    ui->lineEdit_pid->setValidator(new QRegularExpressionValidator( QRegularExpression("[a-zA-Z0-9_,]{0,20}$|[.]{1}[*]{1}"), 0));
+    ui->lineEdit_tid->setValidator(new QRegularExpressionValidator( QRegularExpression("[a-zA-Z0-9_,]{0,20}$|[.]{1}[*]{1}"), 0));
     ui->lineEdit_fname->setValidator(new QRegularExpressionValidator( QRegularExpression("[a-zA-Z0-9_-]\\S{0,20}$"), 0));
     ui->lineEdit_fsize->setValidator( new QRegularExpressionValidator( QRegularExpression("[1-9]\\d{0,7}$"), 0));
     ui->lineEdit_nofiles->setValidator( new QRegularExpressionValidator( QRegularExpression("[1-9]\\d{0,2}$"), 0));
@@ -160,8 +160,8 @@ void LogstorageConfigCreatorForm::on_pushButton_Add_clicked()
 
             remove_filter(true);
 
-            filter.setApid(ui->lineEdit_apid->text());
-            filter.setCtid(ui->lineEdit_ctid->text());
+            filter.setPid(ui->lineEdit_pid->text());
+            filter.setTid(ui->lineEdit_tid->text());
             filter.setLogLevel(ui->comboBox_level->currentText());
             filter.setFileName(ui->lineEdit_fname->text());
             filter.setFileSize(ui->lineEdit_fsize->text().toInt());
@@ -179,8 +179,8 @@ void LogstorageConfigCreatorForm::on_pushButton_Add_clicked()
         else /* add a new at the end */
         {
             ui->textEdit->moveCursor(QTextCursor::End);
-            filter.setApid(ui->lineEdit_apid->text());
-            filter.setCtid(ui->lineEdit_ctid->text());
+            filter.setPid(ui->lineEdit_pid->text());
+            filter.setTid(ui->lineEdit_tid->text());
             filter.setLogLevel(ui->comboBox_level->currentText());
             filter.setFileName(ui->lineEdit_fname->text());
             filter.setFileSize(ui->lineEdit_fsize->text().toInt());
@@ -284,12 +284,12 @@ void LogstorageConfigCreatorForm::on_pushButton_LoadFile_clicked()
         QStringList keys = settings.childKeys();
         foreach (QString k, keys) {
             if (k.compare("LogAppName") == 0) {
-                ui->lineEdit_apid->setText(settings.value(k).toString());
-                //filter.setApid(settings.value(k).toString().toLatin1());
+                ui->lineEdit_pid->setText(settings.value(k).toString());
+                //filter.setPid(settings.value(k).toString().toLatin1());
             }
             else if (k.compare("ContextName") == 0) {
-                ui->lineEdit_ctid->setText(settings.value(k).toString());
-                //filter.setCtid(settings.value(k).toString().toLatin1());
+                ui->lineEdit_tid->setText(settings.value(k).toString());
+                //filter.setTid(settings.value(k).toString().toLatin1());
             }
             else if (k.compare("LogLevel") == 0) {
                 int index = ui->comboBox_level->findText(settings.value(k).toString());
@@ -322,8 +322,8 @@ void LogstorageConfigCreatorForm::load_filter(int idx)
 
     LogstorageFilter filter = filters->value(ui->comboBox_filter->currentText());
 
-    ui->lineEdit_apid->setText(filter.getApid());
-    ui->lineEdit_ctid->setText(filter.getCtid());
+    ui->lineEdit_pid->setText(filter.getPid());
+    ui->lineEdit_tid->setText(filter.getTid());
 
     idx = ui->comboBox_level->findText(filter.getLogLevel());
     if ( idx != -1 ) // -1 for not found
@@ -336,8 +336,8 @@ void LogstorageConfigCreatorForm::load_filter(int idx)
 
 void LogstorageConfigCreatorForm::setFilterDefaults()
 {
-    ui->lineEdit_apid->setText(QString(""));
-    ui->lineEdit_ctid->setText(QString(""));
+    ui->lineEdit_pid->setText(QString(""));
+    ui->lineEdit_tid->setText(QString(""));
 
     int index = ui->comboBox_level->findText(QString("DLT_LOG_INFO"));
     if ( index != -1 ) // -1 for not found
@@ -352,60 +352,60 @@ bool LogstorageConfigCreatorForm::validateFilter()
 {
 
     /* check for wildcards */
-    if(ui->lineEdit_apid->text().contains(QString(".*")) && ui->lineEdit_ctid->text().contains(".*"))
+    if(ui->lineEdit_pid->text().contains(QString(".*")) && ui->lineEdit_tid->text().contains(".*"))
     {
         QMessageBox msgBox;
-        msgBox.setText("Wildcard for apid and ctid is prohibited.");
+        msgBox.setText("Wildcard for pid and tid is prohibited.");
         msgBox.exec();
 
-        ui->lineEdit_apid->setFocus();
+        ui->lineEdit_pid->setFocus();
         return false;
     }
 
     /* check if length bigger 2 and ".*" inside */
-    if(ui->lineEdit_apid->text().length() > 2 && ui->lineEdit_apid->text().indexOf(QString(".")) != -1)
+    if(ui->lineEdit_pid->text().length() > 2 && ui->lineEdit_pid->text().indexOf(QString(".")) != -1)
     {
         QMessageBox msgBox;
-        msgBox.setText("Application Id is incorrect. Possibly . or .* within other apids.");
+        msgBox.setText("Process Id is incorrect. Possibly . or .* within other pids.");
         msgBox.exec();
 
-        ui->lineEdit_apid->setFocus();
+        ui->lineEdit_pid->setFocus();
         return false;
     }
 
-    QStringList apids = ui->lineEdit_apid->text().split(QString(","));
+    QStringList pids = ui->lineEdit_pid->text().split(QString(","));
 
-    foreach(QString s, apids)
+    foreach(QString s, pids)
     {
         if(s.length() < 1 || s.length() > 4) {
             QMessageBox msgBox;
-            msgBox.setText("One or more Application Ids have an invalid length.");
+            msgBox.setText("One or more Process Ids have an invalid length.");
             msgBox.exec();
-            ui->lineEdit_apid->setFocus();
+            ui->lineEdit_pid->setFocus();
             return false;
         }
     }
 
     /* check if length bigger 2 and ".*" inside */
-    if(ui->lineEdit_ctid->text().length() > 2 && ui->lineEdit_ctid->text().indexOf(QString(".")) != -1)
+    if(ui->lineEdit_tid->text().length() > 2 && ui->lineEdit_tid->text().indexOf(QString(".")) != -1)
     {
         QMessageBox msgBox;
-        msgBox.setText("Context Id is incorrect. Possibly . or .* within other apids.");
+        msgBox.setText("Thread Id is incorrect. Possibly . or .* within other pids.");
         msgBox.exec();
 
-        ui->lineEdit_ctid->setFocus();
+        ui->lineEdit_tid->setFocus();
         return false;
     }
 
-    QStringList ctids = ui->lineEdit_ctid->text().split(QString(","));
+    QStringList tids = ui->lineEdit_tid->text().split(QString(","));
 
-    foreach(QString s, ctids)
+    foreach(QString s, tids)
     {
         if(s.length() < 1 || s.length() > 4) {
             QMessageBox msgBox;
-            msgBox.setText("One or more Context Ids have an invalid length.");
+            msgBox.setText("One or more Thread Ids have an invalid length.");
             msgBox.exec();
-            ui->lineEdit_ctid->setFocus();
+            ui->lineEdit_tid->setFocus();
             return false;
         }
     }

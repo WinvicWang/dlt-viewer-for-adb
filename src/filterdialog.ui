@@ -219,7 +219,7 @@
      <item row="2" column="3">
       <widget class="QCheckBox" name="checkBoxRegexp_Context">
        <property name="toolTip">
-        <string>Enable this option, to use regular expressions for ContextId  text.</string>
+        <string>Enable this option, to use regular expressions for ThreadId  text.</string>
        </property>
        <property name="text">
         <string>RegExp</string>
@@ -234,14 +234,14 @@
       </widget>
      </item>
      <item row="2" column="1" colspan="2">
-      <widget class="QLineEdit" name="lineEditContextId">
+      <widget class="QLineEdit" name="lineEditThreadId">
        <property name="maxLength">
         <number>40</number>
        </property>
       </widget>
      </item>
      <item row="1" column="1" colspan="2">
-      <widget class="QLineEdit" name="lineEditApplicationId"/>
+      <widget class="QLineEdit" name="lineEditProcessId"/>
      </item>
      <item row="3" column="3">
       <widget class="QCheckBox" name="checkBoxRegexp_Header">
@@ -254,9 +254,9 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QCheckBox" name="checkBoxContextId">
+      <widget class="QCheckBox" name="checkBoxThreadId">
        <property name="text">
-        <string>Context Id:</string>
+        <string>Thread Id:</string>
        </property>
       </widget>
      </item>
@@ -340,7 +340,7 @@
       </widget>
      </item>
      <item row="0" column="1" colspan="2">
-      <widget class="QLineEdit" name="lineEditEcuId"/>
+      <widget class="QLineEdit" name="lineEdittag"/>
      </item>
      <item row="4" column="1" colspan="2">
       <widget class="QLineEdit" name="lineEditPayloadText"/>
@@ -359,9 +359,9 @@
       </widget>
      </item>
      <item row="1" column="3">
-      <widget class="QCheckBox" name="checkBoxRegexp_Appid">
+      <widget class="QCheckBox" name="checkBoxRegexp_Procid">
        <property name="toolTip">
-        <string>Enable this option, to use regular expressions for AppId  text.</string>
+        <string>Enable this option, to use regular expressions for ProcId  text.</string>
        </property>
        <property name="text">
         <string>RegExp</string>
@@ -415,9 +415,9 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QCheckBox" name="checkBoxApplicationId">
+      <widget class="QCheckBox" name="checkBoxProcessId">
        <property name="text">
-        <string>Application Id:</string>
+        <string>Process Id:</string>
        </property>
       </widget>
      </item>
@@ -449,9 +449,9 @@
       </layout>
      </item>
      <item row="0" column="0">
-      <widget class="QCheckBox" name="checkBoxEcuId">
+      <widget class="QCheckBox" name="checkBoxtag">
        <property name="text">
-        <string>ECU Id:</string>
+        <string>Tag:</string>
        </property>
       </widget>
      </item>
@@ -977,13 +977,13 @@
   <tabstop>pushButton_c9</tabstop>
   <tabstop>pushButton_c10</tabstop>
   <tabstop>buttonSelectColor</tabstop>
-  <tabstop>checkBoxEcuId</tabstop>
-  <tabstop>lineEditEcuId</tabstop>
-  <tabstop>checkBoxApplicationId</tabstop>
-  <tabstop>lineEditApplicationId</tabstop>
-  <tabstop>checkBoxRegexp_Appid</tabstop>
-  <tabstop>checkBoxContextId</tabstop>
-  <tabstop>lineEditContextId</tabstop>
+  <tabstop>checkBoxtag</tabstop>
+  <tabstop>lineEdittag</tabstop>
+  <tabstop>checkBoxProcessId</tabstop>
+  <tabstop>lineEditProcessId</tabstop>
+  <tabstop>checkBoxRegexp_Procid</tabstop>
+  <tabstop>checkBoxThreadId</tabstop>
+  <tabstop>lineEditThreadId</tabstop>
   <tabstop>checkBoxRegexp_Context</tabstop>
   <tabstop>checkBoxHeaderText</tabstop>
   <tabstop>lineEditHeaderText</tabstop>

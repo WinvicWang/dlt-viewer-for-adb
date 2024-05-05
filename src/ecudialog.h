@@ -38,6 +38,7 @@ public:
     QString id();
     QString description();
     int interfacetype();
+    QString adbId();
     QString hostname();
     QString mcastaddress();
     QString serialPort();

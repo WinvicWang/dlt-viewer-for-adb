@@ -52,7 +52,7 @@ void Form::autoscrollStateChanged(bool enabled)
 void Form::on_pushButton_clicked()
 {
     if(plugin->dltControl)
-        plugin->dltControl->sendInjection(ui->comboBoxConnections->currentIndex(),ui->lineEditApplicationId->text(),ui->lineEditContextId->text(),ui->lineEditServiceId->text().toInt(),ui->lineEditData->text().toLatin1());
+        plugin->dltControl->sendInjection(ui->comboBoxConnections->currentIndex(),ui->lineEditProcessId->text(),ui->lineEditThreadId->text(),ui->lineEditServiceId->text().toInt(),ui->lineEditData->text().toLatin1());
 }
 
 void Form::on_pushButtonJumpTo_clicked()

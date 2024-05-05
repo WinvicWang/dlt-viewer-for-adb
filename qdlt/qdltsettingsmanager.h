@@ -108,15 +108,15 @@ public:
     int showTime; // project and local setting
     int showTimestamp; // project and local setting
     int showCount; // project and local setting
-    int showEcuId; // project and local setting
-    int showApId; // project and local setting
-    int showApIdDesc; // project and local setting
-    int showCtId; // project and local setting
-    int showCtIdDesc; // project and local setting
+    int showtag; // project and local setting
+    int showPid; // project and local setting
+    int showPidDesc; // project and local setting
+    int showTid; // project and local setting
+    int showTidDesc; // project and local setting
     int showSessionId; // project and local setting
     int showSessionName; // project and local setting
     int showType; // project and local setting
-    int showSubtype; // project and local setting
+    int showLogLevel; // project and local setting
     int showMode; // project and local setting
     int showNoar; // project and local setting
     int showPayload; // project and local setting

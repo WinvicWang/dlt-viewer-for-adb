@@ -114,7 +114,7 @@ char *nw_trace_type[] = {"","ipc","can","flexray","most","vfb","","","","","",""
 char *control_type[] = {"","request","response","time","","","","","","","","","","","",""};
 static char *service_id[] = {"","set_log_level","set_trace_status","get_log_info","get_default_log_level","store_config","reset_to_factory_default",
                              "set_com_interface_status","set_com_interface_max_bandwidth","set_verbose_mode","set_message_filtering","set_timing_packets",
-                             "get_local_time","use_ecu_id","use_session_id","use_timestamp","use_extended_header","set_default_log_level","set_default_trace_status",
+                             "get_local_time","use_tag","use_session_id","use_timestamp","use_extended_header","set_default_log_level","set_default_trace_status",
                              "get_software_version","message_buffer_overflow"
                             };
 static char *return_type[] = {"ok","not_supported","error","","","","","","no_matching_context_id"};
@@ -434,7 +434,7 @@ int dlt_filter_load(DltFilter *filter,const char *filename,int verbose)
 {
     FILE *handle;
     char str1[DLT_COMMON_BUFFER_LENGTH];
-    char apid[DLT_ID_SIZE],ctid[DLT_ID_SIZE];
+    char pid[DLT_ID_SIZE],tid[DLT_ID_SIZE];
 
     PRINT_FUNCTION_VERBOSE(verbose);
 
@@ -469,11 +469,11 @@ int dlt_filter_load(DltFilter *filter,const char *filename,int verbose)
         printf(" %s",str1);
         if (strcmp(str1,"----")==0)
         {
-            dlt_set_id(apid,"");
+            dlt_set_id(pid,"");
         }
         else
         {
-            dlt_set_id(apid,str1);
+            dlt_set_id(pid,str1);
         }
 
         str1[0]=0;
@@ -489,16 +489,16 @@ int dlt_filter_load(DltFilter *filter,const char *filename,int verbose)
         printf(" %s\r\n",str1);
         if (strcmp(str1,"----")==0)
         {
-            dlt_set_id(ctid,"");
+            dlt_set_id(tid,"");
         }
         else
         {
-            dlt_set_id(ctid,str1);
+            dlt_set_id(tid,str1);
         }
 
         if (filter->counter<DLT_FILTER_MAX)
         {
-            dlt_filter_add(filter,apid,ctid,verbose);
+            dlt_filter_add(filter,pid,tid,verbose);
         }
         else
         {
@@ -537,22 +537,22 @@ int dlt_filter_save(DltFilter *filter,const char *filename,int verbose)
 
     for (num=0;num<filter->counter;num++)
     {
-        if (filter->apid[num][0]==0)
+        if (filter->pid[num][0]==0)
         {
             fprintf(handle,"---- ");
         }
         else
         {
-            dlt_print_id(buf,filter->apid[num]);
+            dlt_print_id(buf,filter->pid[num]);
             fprintf(handle,"%s ",buf);
         }
-        if (filter->ctid[num][0]==0)
+        if (filter->tid[num][0]==0)
         {
             fprintf(handle,"---- ");
         }
         else
         {
-            dlt_print_id(buf,filter->ctid[num]);
+            dlt_print_id(buf,filter->tid[num]);
             fprintf(handle,"%s ",buf);
         }
     }
@@ -562,33 +562,33 @@ int dlt_filter_save(DltFilter *filter,const char *filename,int verbose)
     return 0;
 }
 
-int dlt_filter_find(DltFilter *filter,const char *apid,const char *ctid, int verbose)
+int dlt_filter_find(DltFilter *filter,const char *pid,const char *tid, int verbose)
 {
     int num;
 
     PRINT_FUNCTION_VERBOSE(verbose);
 
-    if ((filter==0) || (apid==0))
+    if ((filter==0) || (pid==0))
     {
         return -1;
     }
 
     for (num=0; num<filter->counter; num++)
     {
-        if (memcmp(filter->apid[num],apid,DLT_ID_SIZE)==0)
+        if (memcmp(filter->pid[num],pid,DLT_ID_SIZE)==0)
         {
-            /* apid matches, now check for ctid */
-            if (ctid==0)
+            /* pid matches, now check for tid */
+            if (tid==0)
             {
-                /* check if empty ctid matches */
-                if (memcmp(filter->ctid[num],"",DLT_ID_SIZE)==0)
+                /* check if empty tid matches */
+                if (memcmp(filter->tid[num],"",DLT_ID_SIZE)==0)
                 {
                     return num;
                 }
             }
             else
             {
-                if (memcmp(filter->ctid[num],ctid,DLT_ID_SIZE)==0)
+                if (memcmp(filter->tid[num],tid,DLT_ID_SIZE)==0)
                 {
                     return num;
                 }
@@ -599,11 +599,11 @@ int dlt_filter_find(DltFilter *filter,const char *apid,const char *ctid, int ver
     return -1; /* Not found */
 }
 
-int dlt_filter_add(DltFilter *filter,const char *apid,const char *ctid, int verbose)
+int dlt_filter_add(DltFilter *filter,const char *pid,const char *tid, int verbose)
 {
     PRINT_FUNCTION_VERBOSE(verbose);
 
-    if ((filter==0) || (apid==0))
+    if ((filter==0) || (pid==0))
     {
         return -1;
     }
@@ -614,14 +614,14 @@ int dlt_filter_add(DltFilter *filter,const char *apid,const char *ctid, int verb
         return -1;
     }
 
-    /* add each filter (apid, ctid) only once to filter array */
-    if (dlt_filter_find(filter,apid,ctid,verbose)<0)
+    /* add each filter (pid, tid) only once to filter array */
+    if (dlt_filter_find(filter,pid,tid,verbose)<0)
     {
         /* filter not found, so add it to filter array */
         if (filter->counter<DLT_FILTER_MAX)
         {
-            dlt_set_id(filter->apid[filter->counter],apid);
-            dlt_set_id(filter->ctid[filter->counter],(ctid?ctid:""));
+            dlt_set_id(filter->pid[filter->counter],pid);
+            dlt_set_id(filter->tid[filter->counter],(tid?tid:""));
 
             filter->counter++;
 
@@ -632,25 +632,25 @@ int dlt_filter_add(DltFilter *filter,const char *apid,const char *ctid, int verb
     return -1;
 }
 
-int dlt_filter_delete(DltFilter *filter,const char *apid,const char *ctid, int verbose)
+int dlt_filter_delete(DltFilter *filter,const char *pid,const char *tid, int verbose)
 {
     int j,k;
     int found=0;
 
     PRINT_FUNCTION_VERBOSE(verbose);
 
-    if ((filter==0) || (apid==0))
+    if ((filter==0) || (pid==0))
     {
         return -1;
     }
 
     if (filter->counter>0)
     {
-        /* Get first occurence of apid and ctid in filter array */
+        /* Get first occurence of pid and tid in filter array */
         for (j=0; j<filter->counter; j++)
         {
-            if ((memcmp(filter->apid[j],apid,DLT_ID_SIZE)==0) &&
-                (memcmp(filter->ctid[j],ctid,DLT_ID_SIZE)==0)
+            if ((memcmp(filter->pid[j],pid,DLT_ID_SIZE)==0) &&
+                (memcmp(filter->tid[j],tid,DLT_ID_SIZE)==0)
                )
 
             {
@@ -664,13 +664,13 @@ int dlt_filter_delete(DltFilter *filter,const char *apid,const char *ctid, int v
             /* j is index */
             /* Copy from j+1 til end to j til end-1 */
 
-            dlt_set_id(filter->apid[j],"");
-            dlt_set_id(filter->ctid[j],"");
+            dlt_set_id(filter->pid[j],"");
+            dlt_set_id(filter->tid[j],"");
 
             for (k=j; k<(filter->counter-1); k++)
             {
-                dlt_set_id(filter->apid[k],filter->apid[k+1]);
-                dlt_set_id(filter->ctid[k],filter->ctid[k+1]);
+                dlt_set_id(filter->pid[k],filter->pid[k+1]);
+                dlt_set_id(filter->tid[k],filter->tid[k+1]);
             }
 
             filter->counter--;
@@ -778,9 +778,9 @@ int dlt_message_header_flags(DltMessage *msg,char *text,int textlength,int flags
         sprintf(text+strlen(text),"%.3d ",msg->standardheader->mcnt);
     }
 
-    if ((flags & DLT_HEADER_SHOW_ECUID) == DLT_HEADER_SHOW_ECUID)
+    if ((flags & DLT_HEADER_SHOW_TAG) == DLT_HEADER_SHOW_TAG)
     {
-        /* print ecu id, use header extra if available, else storage header value */
+        /* print tag, use header extra if available, else storage header value */
         if ( DLT_IS_HTYP_WEID(msg->standardheader->htyp) )
         {
             dlt_print_id(text+strlen(text),msg->headerextra.ecu);
@@ -791,13 +791,13 @@ int dlt_message_header_flags(DltMessage *msg,char *text,int textlength,int flags
         }
     }
 
-    /* print app id and context id if extended header available, else '----' */#
-    if ((flags & DLT_HEADER_SHOW_APID) == DLT_HEADER_SHOW_APID)
+    /* print app id and thread id if extended header available, else '----' */#
+    if ((flags & DLT_HEADER_SHOW_PID) == DLT_HEADER_SHOW_PID)
     {
         sprintf(text+strlen(text)," ");
-        if ((DLT_IS_HTYP_UEH(msg->standardheader->htyp)) && (msg->extendedheader->apid[0]!=0))
+        if ((DLT_IS_HTYP_UEH(msg->standardheader->htyp)) && (msg->extendedheader->pid[0]!=0))
         {
-            dlt_print_id(text+strlen(text),msg->extendedheader->apid);
+            dlt_print_id(text+strlen(text),msg->extendedheader->pid);
         }
         else
         {
@@ -807,11 +807,11 @@ int dlt_message_header_flags(DltMessage *msg,char *text,int textlength,int flags
         sprintf(text+strlen(text)," ");
     }
 
-    if ((flags & DLT_HEADER_SHOW_CTID) == DLT_HEADER_SHOW_CTID)
+    if ((flags & DLT_HEADER_SHOW_TID) == DLT_HEADER_SHOW_TID)
     {
-        if ((DLT_IS_HTYP_UEH(msg->standardheader->htyp)) && (msg->extendedheader->ctid[0]!=0))
+        if ((DLT_IS_HTYP_UEH(msg->standardheader->htyp)) && (msg->extendedheader->tid[0]!=0))
         {
-            dlt_print_id(text+strlen(text),msg->extendedheader->ctid);
+            dlt_print_id(text+strlen(text),msg->extendedheader->tid);
         }
         else
         {
@@ -1090,8 +1090,8 @@ int dlt_message_filter_check(DltMessage *msg,DltFilter *filter,int verbose)
     {
         /* check each filter if it matches */
         if ((DLT_IS_HTYP_UEH(msg->standardheader->htyp)) &&
-                (filter->apid[num][0]==0 || memcmp(filter->apid[num],msg->extendedheader->apid,DLT_ID_SIZE)==0) &&
-                (filter->ctid[num][0]==0 || memcmp(filter->ctid[num],msg->extendedheader->ctid,DLT_ID_SIZE)==0) )
+                (filter->pid[num][0]==0 || memcmp(filter->pid[num],msg->extendedheader->pid,DLT_ID_SIZE)==0) &&
+                (filter->tid[num][0]==0 || memcmp(filter->tid[num],msg->extendedheader->tid,DLT_ID_SIZE)==0) )
         {
             found = 1;
             break;
@@ -1493,7 +1493,7 @@ int dlt_file_read_header_raw(DltFile *file,int resync,int verbose)
     memset(file->msg.storageheader,0,sizeof(DltStorageHeader));
 
     /* Set storage header */
-    dlt_set_storageheader(file->msg.storageheader,DLT_COMMON_DUMMY_ECUID);
+    dlt_set_storageheader(file->msg.storageheader,DLT_COMMON_DUMMY_TAG);
 
     /* no check for storage header id*/
 

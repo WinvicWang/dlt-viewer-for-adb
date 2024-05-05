@@ -84,12 +84,12 @@ QVariant SearchTableModel::data(const QModelIndex &index, int role) const
             return QString("%1.%2").arg(msg.getTimestamp()/10000).arg(msg.getTimestamp()%10000,4,10,QLatin1Char('0'));
         case FieldNames::Counter:
             return QString("%1").arg(msg.getMessageCounter());
-        case FieldNames::EcuId:
-            return msg.getEcuid();
-        case FieldNames::AppId:
-            switch(project->settings->showApIdDesc){
+        case FieldNames::tag:
+            return msg.getTag();
+        case FieldNames::ProcId:
+            switch(project->settings->showPidDesc){
             case 0:
-                return msg.getApid();
+                return msg.getPid();
                 break;
             case 1:
                   for(int num = 0; num < project->ecu->topLevelItemCount (); num++)
@@ -98,21 +98,21 @@ QVariant SearchTableModel::data(const QModelIndex &index, int role) const
                     for(int numapp = 0; numapp < ecuitem->childCount(); numapp++)
                     {
                         ApplicationItem * appitem = (ApplicationItem *) ecuitem->child(numapp);
-                        if(appitem->id == msg.getApid() && !appitem->description.isEmpty())
+                        if(appitem->id == msg.getPid() && !appitem->description.isEmpty())
                         {
                            return appitem->description;
                         }
                     }
                    }
-                  return QString("Apid: %1 (No description)").arg(msg.getApid());
+                  return QString("Pid: %1 (No description)").arg(msg.getPid());
                 break;
              default:
-                return msg.getApid();
+                return msg.getPid();
             }
-        case FieldNames::ContextId:
-            switch(project->settings->showCtIdDesc){
+        case FieldNames::ThreadId:
+            switch(project->settings->showTidDesc){
             case 0:
-                return msg.getCtid();
+                return msg.getTid();
                 break;
             case 1:
 
@@ -126,7 +126,7 @@ QVariant SearchTableModel::data(const QModelIndex &index, int role) const
                         {
                             ContextItem * conitem = (ContextItem *) appitem->child(numcontext);
 
-                            if(appitem->id == msg.getApid() && conitem->id == msg.getCtid()
+                            if(appitem->id == msg.getPid() && conitem->id == msg.getTid()
                                     && !conitem->description.isEmpty())
                             {
                                return conitem->description;
@@ -134,10 +134,10 @@ QVariant SearchTableModel::data(const QModelIndex &index, int role) const
                         }
                     }
                    }
-                  return  QString("Ctid: %1 (No description)").arg(msg.getCtid());
+                  return  QString("Tid: %1 (No description)").arg(msg.getTid());
                 break;
              default:
-                return msg.getCtid();
+                return msg.getTid();
             }
         case FieldNames::SessionId:
             switch(project->settings->showSessionName){
@@ -155,7 +155,7 @@ QVariant SearchTableModel::data(const QModelIndex &index, int role) const
             }
         case FieldNames::Type:
             return msg.getTypeString();
-        case FieldNames::Subtype:
+        case FieldNames::LogLevel:
             return msg.getSubtypeString();
         case FieldNames::Mode:
             return msg.getModeString();

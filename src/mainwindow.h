@@ -30,6 +30,7 @@
 #include <QProgressBar>
 #include <QCompleter>
 #include <QStringListModel>
+#include <QProcess>
 
 #include "tablemodel.h"
 #include "settingsdialog.h"
@@ -160,7 +161,7 @@ private:
 
     /* injections */
     QString injectionAplicationId;
-    QString injectionContextId;
+    QString injectionThreadId;
     QString injectionServiceId;
     QString injectionData;
     bool injectionDataBinary;
@@ -263,8 +264,8 @@ private:
     void ControlServiceRequest(EcuItem* ecuitem, int service_id );
     void SendInjection(EcuItem* ecuitem);
 
-    void controlMessage_SendControlMessage(EcuItem* ecuitem,DltMessage &msg, QString appid, QString contid);
-    void controlMessage_WriteControlMessage(DltMessage &msg, QString appid, QString contid);
+    void controlMessage_SendControlMessage(EcuItem* ecuitem,DltMessage &msg, QString procid, QString contid);
+    void controlMessage_WriteControlMessage(DltMessage &msg, QString procid, QString contid);
     void controlMessage_SetLogLevel(EcuItem* ecuitem, QString app, QString con,int log_level);
     void controlMessage_SetDefaultLogLevel(EcuItem* ecuitem, int status);
     void controlMessage_SetTraceStatus(EcuItem* ecuitem,QString app, QString con,int status);
@@ -274,8 +275,8 @@ private:
     void controlMessage_GetSoftwareVersion(EcuItem* ecuitem);
     void controlMessage_GetLogInfo(EcuItem* ecuitem);
     void controlMessage_ReceiveControlMessage(EcuItem *ecuitem,QDltMsg &msg);
-    void controlMessage_SetContext(EcuItem *ecuitem, QString apid, QString ctid,QString ctdescription,int log_level,int trace_status);
-    void controlMessage_SetApplication(EcuItem *ecuitem, QString apid, QString appdescription);
+    void controlMessage_SetContext(EcuItem *ecuitem, QString pid, QString tid,QString ctdescription,int log_level,int trace_status);
+    void controlMessage_SetApplication(EcuItem *ecuitem, QString pid, QString appdescription);
     void controlMessage_Marker();
 
     void filterDialogRead(FilterDialog &dlg,FilterItem* item);
@@ -391,7 +392,7 @@ private slots:
     void reloadLogFileProgressMax(int num);
     void reloadLogFileProgress(int num);
     void reloadLogFileProgressText(QString text);
-    void reloadLogFileVersionString(QString ecuId, QString version);
+    void reloadLogFileVersionString(QString tag, QString version);
     void reloadLogFileFinishIndex();
     void reloadLogFileFinishFilter();
     void reloadLogFileFinishDefaultFilter();
@@ -446,6 +447,9 @@ public slots:
     void unmark_all_lines();
     void filterIndexStart();
     void filterIndexEnd();
+
+    void readAdbData(EcuItem *ecuitem);
+    void adbDisconnected(int exitCode, QProcess::ExitStatus exitStatus);
 
 private slots:
 
@@ -589,7 +593,7 @@ private slots:
 
 public slots:
 
-    void sendInjection(int index,QString applicationId,QString contextId,int serviceId,QByteArray data);
+    void sendInjection(int index,QString processId,QString threadId,int serviceId,QByteArray data);
     void filterOrderChanged();
     void filterCountChanged();
     void jumpToMsgSignal(int index);
@@ -601,7 +605,7 @@ public slots:
     void reopenFileSignal();
 
     void controlMessage_Timezone(int timezone, unsigned char dst);
-    void controlMessage_UnregisterContext(QString ecuId,QString appId,QString ctId);
+    void controlMessage_UnregisterContext(QString tag,QString procId,QString tid);
 
     //History Slots
     void onAddActionToHistory();

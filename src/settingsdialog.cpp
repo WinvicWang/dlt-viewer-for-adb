@@ -278,36 +278,36 @@ void SettingsDialog::writeDlg()
     ui->checkBoxTimestamp->setCheckState(settings->showTimestamp?Qt::Checked:Qt::Unchecked);
     ui->checkBoxCount->setCheckState(settings->showCount?Qt::Checked:Qt::Unchecked);
 
-    ui->checkBoxEcuid->setCheckState(settings->showEcuId?Qt::Checked:Qt::Unchecked);
+    ui->checkBoxTag->setCheckState(settings->showtag?Qt::Checked:Qt::Unchecked);
 
-    ui->groupBoxAppId->setChecked(settings->showApId);
-    if(ui->groupBoxAppId->isChecked())
+    ui->groupBoxProcId->setChecked(settings->showPid);
+    if(ui->groupBoxProcId->isChecked())
     {
-        ui->radioButtonAppId->setEnabled(true);
-        ui->radioButtonAppIdDesc->setEnabled(true);
+        ui->radioButtonProcId->setEnabled(true);
+        ui->radioButtonProcIdDesc->setEnabled(true);
     }
     else
     {
-        ui->radioButtonAppId->setEnabled(false);
-        ui->radioButtonAppIdDesc->setEnabled(false);
+        ui->radioButtonProcId->setEnabled(false);
+        ui->radioButtonProcIdDesc->setEnabled(false);
     }
-    switch(settings->showApIdDesc)
+    switch(settings->showPidDesc)
     {
     case 0:
-        ui->radioButtonAppId->setChecked(true);
-        ui->radioButtonAppIdDesc->setChecked(false);
+        ui->radioButtonProcId->setChecked(true);
+        ui->radioButtonProcIdDesc->setChecked(false);
         break;
     case 1:
-        ui->radioButtonAppId->setChecked(false);
-        ui->radioButtonAppIdDesc->setChecked(true);
+        ui->radioButtonProcId->setChecked(false);
+        ui->radioButtonProcIdDesc->setChecked(true);
         break;
     default:
-        ui->radioButtonAppId->setChecked(true);
-        ui->radioButtonAppIdDesc->setChecked(false);
+        ui->radioButtonProcId->setChecked(true);
+        ui->radioButtonProcIdDesc->setChecked(false);
         break;
     }
 
-    ui->groupBoxConId->setChecked(settings->showCtId);
+    ui->groupBoxConId->setChecked(settings->showTid);
     if(ui->groupBoxConId->isChecked())
     {
         ui->radioButtonConId->setEnabled(true);
@@ -318,7 +318,7 @@ void SettingsDialog::writeDlg()
         ui->radioButtonConId->setEnabled(false);
         ui->radioButtonConIdDesc->setEnabled(false);
     }
-    switch(settings->showCtIdDesc)
+    switch(settings->showTidDesc)
     {
     case 0:
         ui->radioButtonConId->setChecked(true);
@@ -363,7 +363,7 @@ void SettingsDialog::writeDlg()
 
     ui->checkBoxType->setCheckState(settings->showType?Qt::Checked:Qt::Unchecked);
 
-    ui->checkBoxSubtype->setCheckState(settings->showSubtype?Qt::Checked:Qt::Unchecked);
+    ui->checkBoxSubtype->setCheckState(settings->showLogLevel?Qt::Checked:Qt::Unchecked);
     ui->checkBoxMode->setCheckState(settings->showMode?Qt::Checked:Qt::Unchecked);
     ui->checkBoxNoar->setCheckState(settings->showNoar?Qt::Checked:Qt::Unchecked);
     ui->checkBoxPayload->setCheckState(settings->showPayload?Qt::Checked:Qt::Unchecked);
@@ -441,16 +441,16 @@ void SettingsDialog::readDlg()
     settings->showTimestamp = ( ui->checkBoxTimestamp->checkState() == Qt::Checked);
     settings->showCount =     ( ui->checkBoxCount->checkState() == Qt::Checked);
 
-    settings->showEcuId =     ( ui->checkBoxEcuid->checkState() == Qt::Checked);
-    settings->showApId =      ( ui->groupBoxAppId->isChecked() == true ? 1:0);
-    settings->showApIdDesc =  ( ui->radioButtonAppIdDesc->isChecked()== true ? 1:0);
-    settings->showCtId =      ( ui->groupBoxConId->isChecked() == true ? 1:0);
-    settings->showCtIdDesc =  ( ui->radioButtonConIdDesc->isChecked()== true ? 1:0);
+    settings->showtag =     ( ui->checkBoxTag->checkState() == Qt::Checked);
+    settings->showPid =      ( ui->groupBoxProcId->isChecked() == true ? 1:0);
+    settings->showPidDesc =  ( ui->radioButtonProcIdDesc->isChecked()== true ? 1:0);
+    settings->showTid =      ( ui->groupBoxConId->isChecked() == true ? 1:0);
+    settings->showTidDesc =  ( ui->radioButtonConIdDesc->isChecked()== true ? 1:0);
     settings->showSessionId =   ( ui->groupBoxSessionId->isChecked() == true ? 1:0);
     settings->showSessionName = ( ui->radioButtonSessionName->isChecked()== true ? 1:0);
     settings->showType =      ( ui->checkBoxType->checkState() == Qt::Checked);
 
-    settings->showSubtype = ( ui->checkBoxSubtype->checkState() == Qt::Checked);
+    settings->showLogLevel = ( ui->checkBoxSubtype->checkState() == Qt::Checked);
     settings->showMode = ( ui->checkBoxMode->checkState() == Qt::Checked);
     settings->showNoar = ( ui->checkBoxNoar->checkState() == Qt::Checked);
     settings->showPayload = ( ui->checkBoxPayload->checkState() == Qt::Checked);
@@ -652,14 +652,14 @@ void SettingsDialog::on_groupBoxSessionId_clicked(bool checked)
     }
 }
 
-void SettingsDialog::on_groupBoxAppId_clicked(bool checked)
+void SettingsDialog::on_groupBoxProcId_clicked(bool checked)
 {
     if(checked){
-        ui->radioButtonAppId->setEnabled(true);
-        ui->radioButtonAppIdDesc->setEnabled(true);
+        ui->radioButtonProcId->setEnabled(true);
+        ui->radioButtonProcIdDesc->setEnabled(true);
     }else{
-        ui->radioButtonAppId->setEnabled(false);
-        ui->radioButtonAppIdDesc->setEnabled(false);
+        ui->radioButtonProcId->setEnabled(false);
+        ui->radioButtonProcIdDesc->setEnabled(false);
     }
 }
 

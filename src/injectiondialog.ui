@@ -28,7 +28,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Application ID:</string>
+      <string>Process ID:</string>
      </property>
     </widget>
    </item>
@@ -52,7 +52,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Context ID:</string>
+      <string>Thread ID:</string>
      </property>
     </widget>
    </item>
@@ -71,14 +71,14 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QComboBox" name="applicationidComboBox">
+    <widget class="QComboBox" name="processidComboBox">
      <property name="editable">
       <bool>true</bool>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QComboBox" name="contextidComboBox">
+    <widget class="QComboBox" name="threadidComboBox">
      <property name="editable">
       <bool>true</bool>
      </property>
@@ -101,8 +101,8 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>applicationidComboBox</tabstop>
-  <tabstop>contextidComboBox</tabstop>
+  <tabstop>processidComboBox</tabstop>
+  <tabstop>threadidComboBox</tabstop>
   <tabstop>serviceidComboBox</tabstop>
   <tabstop>textRadioButton</tabstop>
   <tabstop>binaryRadioButton</tabstop>

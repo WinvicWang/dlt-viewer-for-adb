@@ -33,7 +33,7 @@ Changes
     * Temporary files were not saved before.
     * Improve performance of UDP reception.
     * Add setting to ECU to select storage header version.
-    * Write always ECU Id as configured in ECU settings.
+    * Write always Tag as configured in ECU settings.
     * Always write Control messages to DLT file.
     * Do not interpret control messages during UDP reception.
     * Fix Settings Maximum file size cannot be changed anymore (#342)
@@ -125,7 +125,7 @@ Changes
     * Add UI elements into Pluginlist (MainWindow)
     * Reordering of Plugins in PluginManager
     * added feature to export (selected) Dlt messages as Jira table
-    * Fixed message len for generated message from QDltMsg in case of using sessionId, timestamp and ecuId
+    * Fixed message len for generated message from QDltMsg in case of using sessionId, timestamp and tag
     * Add further commands to DLT Test Robot Plugin.
     * Fix filter in DLT Test Robot Plugin
     * Select UDP interface by interface name instead of IP address
@@ -188,11 +188,11 @@ Changes
     * Fix crash when TCP connection stopped and Serial connection available (#207)
     * [Bugfix] Avoid error Message when cancelling open filter dialog (#204)
     * Add "Save IDs to csv" to config tab (#206)
-        to get a list of registered APID/CTID + description from a dlt log file and save it as comma seperated file
+        to get a list of registered PID/TID + description from a dlt log file and save it as comma seperated file
     * Count up version of filetransferplugin
     * Increased priority of manual markers (#195)
     * Remove using default filter index (#194)
-    * Removed App Id from Filetransfer Plugin (#193)
+    * Removed Process Id from Filetransfer Plugin (#193)
     * Disable RPATH usage: (#192)
         Make the usage of RPATH settings to detect non-standard QT
         installations optional.
@@ -425,7 +425,7 @@ Fixes:
     * Add UDP Unicast / Multicast reception:
     * DLT Payload with \n\r breaks the output in the TableView
     * Change QRegExp to QRegularExpression in qdlt/filters
-    * Add regular expression option to Application Id field in filters
+    * Add regular expression option to Process Id field in filters
     * Add "search" to documentation
     * Rework search functionality:
     * Add 'Copy Selection Payload to Clipboard' menuitems to tables
@@ -550,10 +550,10 @@ Fixes:
       Limit symbol visibility in plugins
    * Performance improvement: Multithreaded DLT file parser
    * Make dlt-viewer show up as an option in file managers.
-   * DBus plugin: Check if messages has Apid "DBUS" as valid dbus message
+   * DBus plugin: Check if messages has Pid "DBUS" as valid dbus message
    * Enable build for MAC
    * Mark the next button in the search dialog as default
-   * DBUS plugin: read configuration file to define APID/CTID to
+   * DBUS plugin: read configuration file to define PID/TID to
      enable DBus message decoding
    * Add cmake build support
 
@@ -685,7 +685,7 @@ Fixes:
   * Fix: DLT Viewer shows messages sorted by time, even if the option is not enabled at startup
   * Updated build script to Qt 5.3.
   * Fixed use of non verbose mode with extended header.
-  * Extended non verbose plugin to differentiate messages by appid and ctid.
+  * Extended non verbose plugin to differentiate messages by procid and tid.
   * Add session id to table view.
   * Show Session/Process Id in DLT Viewer Plugin.
   * Parser: Added Linux installation path
@@ -869,7 +869,7 @@ Fixes:
    * [GDLT-80] Decoderinterface extended - plugins get the information if the action for isMsg or decodeMsg  was triggered by the user
    * [GDLT-78] Extended API of the decoderinterface. Plugins gets a notification if the state of the ECU connection changed
    * [GDLT-58] Merging/Append filter files is possible
-   * [GDLT-61] ApId and CtId description should be left aligned fixed
+   * [GDLT-61] Pid and Tid description should be left aligned fixed
    * [GDLT-59] Added Copy to clipboard in context menu of the tablewidget
    * Reworked the filterUpdate calls
    * Increased max cost of cache to 5000 and fixed bug in filetransferplugin
@@ -927,7 +927,7 @@ Fixes:
    * Fixed Bug in Filetransferplugin - Clear list button
    * Fixed initialisation of injection plugin interface.
    * [GSW-109] Printing of dlt-viewer usage not visibile in windows. Command line usage for windows added to the help menu of the dlt viewer.
-   * [GSW-104] Overload operator< for detailed sorting of appIds and ctIds in the configWidget of the viewer
+   * [GSW-104] Overload operator< for detailed sorting of procIds and tids in the configWidget of the viewer
    * [GSW-102] The dlt viewer plugin snips a part of the payload if < is in the payload
 
 2.4.0:

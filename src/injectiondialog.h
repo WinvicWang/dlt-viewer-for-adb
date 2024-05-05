@@ -31,17 +31,17 @@ namespace Ui {
 class InjectionDialog : public QDialog {
     Q_OBJECT
 public:
-    InjectionDialog(QString appid,QString conid,QWidget *parent = 0);
+    InjectionDialog(QString procid,QString conid,QWidget *parent = 0);
     ~InjectionDialog();
 
-    void setApplicationId(QString text);
-    void setContextId(QString text);
+    void setProcessId(QString text);
+    void setThreadId(QString text);
     void setServiceId(QString text);
     void setData(QString text);
     void setDataBinary(bool mode);
 
-    QString getApplicationId();
-    QString getContextId();
+    QString getProcessId();
+    QString getThreadId();
     QString getServiceId();
     QString getData();
     bool getDataBinary();

@@ -90,7 +90,7 @@ private:
     bool is_payLoadSearchSelected;
     bool is_TimeStampSearchSelected;
     bool is_TimeStampRangeValid;
-    bool fIs_APID_CTID_requested;
+    bool fIs_PID_TID_requested;
 
     QString TimeStampStarttime;
     QString TimeStampStoptime;
@@ -100,8 +100,8 @@ private:
     QString payloadStart;
     QString payloadEnd;
     QString tempPayLoad;
-    QString stApid;
-    QString stCtid;
+    QString stPid;
+    QString stTid;
 
     QColor highlightColor;
 
@@ -136,8 +136,8 @@ private:
     bool payLoadValidityCheck();
     bool payLoadStartpatternCheck();
     bool payLoadStoppatternCheck();
-    QString getApIDText();
-    QString getCtIDText();
+    QString getpidText();
+    QString gettidText();
     QString getTimeStampStart();
     QString getTimeStampEnd();
     QString getPayLoadStampStart();

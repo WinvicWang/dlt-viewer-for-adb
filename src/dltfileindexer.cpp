@@ -252,7 +252,7 @@ bool DltFileIndexer::index(int num)
                     current_message_pos = pos+number-3;
                     counter_header = 3;
                     if(data[number] == 0x01)
-                        storageLength = 16;
+                        storageLength = 88;
                     else
                         storageLength = 13;
                     if(current_message_pos!=0)
@@ -277,7 +277,7 @@ bool DltFileIndexer::index(int num)
                     current_message_pos = pos+number-3;
                     counter_header = 3;
                     if(data[number] == 0x01)
-                        storageLength = 16;
+                        storageLength = 88;
                     else
                         storageLength = 13;
                     // speed up move directly to message length, if inside current buffer

@@ -35,30 +35,30 @@
 class DltFibexKey
 {
 public:
-    DltFibexKey(QString id,QString appid,QString ctid)
+    DltFibexKey(QString id,QString procid,QString tid)
     {
         this->id = id;
-        this->appid = appid;
-        this->ctid = ctid;
+        this->procid = procid;
+        this->tid = tid;
     }
 
     friend bool operator==(const DltFibexKey &e1, const DltFibexKey &e2);
     friend size_t qHash(const DltFibexKey &key);
 
     QString id;
-    QString appid;
-    QString ctid;
+    QString procid;
+    QString tid;
 };
 
 inline bool operator==(const DltFibexKey &e1, const DltFibexKey &e2)
 {
     return (e1.id == e2.id)
-           && (e1.appid == e2.appid) && (e1.ctid == e2.ctid);
+           && (e1.procid == e2.procid) && (e1.tid == e2.tid);
 }
 
 inline size_t qHash(const DltFibexKey &key)
 {
-    return qHash(key.id) ^ qHash(key.appid) ^ qHash(key.ctid);
+    return qHash(key.id) ^ qHash(key.procid) ^ qHash(key.tid);
 }
 
 /**
@@ -97,8 +97,8 @@ public:
         int32_t byteLength;
         uint8_t messageType;
         int8_t  messageInfo;
-        QString appid;
-        QString ctid;
+        QString procid;
+        QString tid;
 
         QList<DltFibexPduRef*> pdureflist;
         uint32_t pduRefCounter;

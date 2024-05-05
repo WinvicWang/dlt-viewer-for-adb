@@ -37,12 +37,12 @@ bool DltExporter::writeCSVHeader(QFile *file)
                     .arg(FieldNames::getName(FieldNames::Time))
                     .arg(FieldNames::getName(FieldNames::TimeStamp))
                     .arg(FieldNames::getName(FieldNames::Counter))
-                    .arg(FieldNames::getName(FieldNames::EcuId))
-                    .arg(FieldNames::getName(FieldNames::AppId))
-                    .arg(FieldNames::getName(FieldNames::ContextId))
+                    .arg(FieldNames::getName(FieldNames::tag))
+                    .arg(FieldNames::getName(FieldNames::ProcId))
+                    .arg(FieldNames::getName(FieldNames::ThreadId))
                     .arg(FieldNames::getName(FieldNames::SessionId))
                     .arg(FieldNames::getName(FieldNames::Type))
-                    .arg(FieldNames::getName(FieldNames::Subtype))
+                    .arg(FieldNames::getName(FieldNames::LogLevel))
                     .arg(FieldNames::getName(FieldNames::Mode))
                     .arg(FieldNames::getName(FieldNames::ArgCount))
                     .arg(FieldNames::getName(FieldNames::Payload));
@@ -57,9 +57,9 @@ void DltExporter::writeCSVLine(int index, QFile *to, QDltMsg msg)
     text += escapeCSVValue(QString("%1.%2").arg(msg.getTimeString()).arg(msg.getMicroseconds(),6,10,QLatin1Char('0'))).append(",");
     text += escapeCSVValue(QString("%1.%2").arg(msg.getTimestamp()/10000).arg(msg.getTimestamp()%10000,4,10,QLatin1Char('0'))).append(",");
     text += escapeCSVValue(QString("%1").arg(msg.getMessageCounter())).append(",");
-    text += escapeCSVValue(QString("%1").arg(msg.getEcuid())).append(",");
-    text += escapeCSVValue(QString("%1").arg(msg.getApid())).append(",");
-    text += escapeCSVValue(QString("%1").arg(msg.getCtid())).append(",");
+    text += escapeCSVValue(QString("%1").arg(msg.getTag())).append(",");
+    text += escapeCSVValue(QString("%1").arg(msg.getPid())).append(",");
+    text += escapeCSVValue(QString("%1").arg(msg.getTid())).append(",");
     text += escapeCSVValue(QString("%1").arg(msg.getSessionid())).append(",");
     text += escapeCSVValue(QString("%1").arg(msg.getTypeString())).append(",");
     text += escapeCSVValue(QString("%1").arg(msg.getSubtypeString())).append(",");
@@ -149,8 +149,8 @@ bool DltExporter::start()
     {
         clipboardString = "||" "Index"
                           "||" "Time" "||" "Timestamp"
-                          "||" "EcuID"
-                          "||" "AppID" "||" "CtxID"
+                          "||" "tag"
+                          "||" "ProcID" "||" "CtxID"
                           "||" "Payload"
                           "||" "Comment"
                           "||\n";
@@ -307,9 +307,9 @@ bool DltExporter::exportMsg(unsigned long int num, QDltMsg &msg, QByteArray &buf
 
         text += "|" + QString("%1.%2").arg(msg.getTimeString()).arg(msg.getMicroseconds(),4,10,QLatin1Char('0')) +
                 "|" + QString("%1.%2").arg(msg.getTimestamp()/10000).arg(msg.getTimestamp()%10000,4,10,QLatin1Char('0')) +
-                "|" + msg.getEcuid() +
-                "|" + msg.getApid() +
-                "|" + msg.getCtid() +
+                "|" + msg.getTag() +
+                "|" + msg.getPid() +
+                "|" + msg.getTid() +
                 "|" + msg.toStringPayload().trimmed().replace('|', "\\|").replace('#', "\\#").replace('*', "\\*") +
                 "| |\n";
         clipboardString += text;

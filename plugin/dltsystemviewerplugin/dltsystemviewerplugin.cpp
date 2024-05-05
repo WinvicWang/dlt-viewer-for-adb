@@ -161,7 +161,7 @@ void DltSystemViewerPlugin::updateProcesses(int , QDltMsg &msg)
                 counterNonVerboseMessages++;
             }
 
-        if(msg.getApid()=="SYS" && msg.getCtid()=="PROC") {
+        if(msg.getPid()=="SYS" && msg.getTid()=="PROC") {
             msg.getArgument(0,arg);
             pid = arg.toString().toInt();
             msg.getArgument(1,arg);
@@ -170,7 +170,7 @@ void DltSystemViewerPlugin::updateProcesses(int , QDltMsg &msg)
                 form->addProcesses(pid,arg.toString(),msg);
             }
         }        
-        if(msg.getApid()=="SYS" && msg.getCtid()=="STAT") {
+        if(msg.getPid()=="SYS" && msg.getTid()=="STAT") {
             msg.getArgument(0,arg);
             seq = arg.toString().toInt();
             if( seq == PROC_STAT_NODE_1 || seq == PROC_STAT_NODE_UNDEFINE ) {

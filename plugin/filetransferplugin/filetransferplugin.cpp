@@ -109,9 +109,9 @@ bool FiletransferPlugin::loadConfig(QString filename)
               {
                   config.setFlerTag( xml.readElementText() );
               }
-              if(xml.name() == QString("TAG_FLCTID"))
+              if(xml.name() == QString("TAG_FLTID"))
               {
-                  config.setFlCtIdTag( xml.readElementText() );
+                  config.setFlTidTag( xml.readElementText() );
               }
               if(xml.name() == QString("AUTOSAVE"))
               {
@@ -163,7 +163,7 @@ QStringList FiletransferPlugin::infoConfig()
 {
     QStringList list;
 
-    list.append("TAG_FLCTID: "+ config.getFlCtIdTag());
+    list.append("TAG_FLTID: "+ config.getFlTidTag());
     list.append("TAG_FLST: "+ config.getFlstTag());
     list.append("TAG_FLDA: "+ config.getFldaTag());
     list.append("TAG_FLFI: "+ config.getFlfiTag());
@@ -257,9 +257,9 @@ void FiletransferPlugin::updateFiletransfer(int index, QDltMsg &msg)
     }
 
 
-    if(config.getFlCtIdTag().compare(msg.getCtid()) != 0)
+    if(config.getFlTidTag().compare(msg.getTid()) != 0)
     {
-        // message is not of CTID defined to indicate file transfer
+        // message is not of TID defined to indicate file transfer
         return;
     }
 

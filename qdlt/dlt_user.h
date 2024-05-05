@@ -151,7 +151,7 @@ typedef enum
  */
 typedef struct
 {
-	char contextID[4];                            /**< context id */
+	char threadID[4];                            /**< thread id */
     int32_t log_level_pos;                        /**< offset in user-application context field */
 } DltContext;
 
@@ -181,7 +181,7 @@ typedef struct
  */
 typedef struct
 {
-    char contextID[DLT_ID_SIZE];      /**< Context ID */
+    char threadID[DLT_ID_SIZE];      /**< Thread ID */
     int8_t log_level;                 /**< Log level */
     int8_t trace_status;              /**< Trace status */
     char *context_description;        /**< description of context */
@@ -194,8 +194,8 @@ typedef struct
  */
 typedef struct
 {
-    char ecuID[DLT_ID_SIZE];             /**< ECU ID */
-    char appID[DLT_ID_SIZE];             /**< Application ID */
+    char tag[DLT_ID_SIZE];             /**< Tag */
+    char procID[DLT_ID_SIZE];             /**< Process ID */
     int dlt_log_handle;                  /**< Handle to fifo of dlt daemon */
     int dlt_user_handle;                 /**< Handle to own fifo */
 
@@ -370,11 +370,11 @@ int dlt_free();
 
 /**
  * Register an application in the daemon.
- * @param appid four byte long character array with the application id
+ * @param procid four byte long character array with the process id
  * @param description long name of the application
  * @return negative value if there was an error
  */
-int dlt_register_app(const char *appid, const char * description);
+int dlt_register_app(const char *procid, const char * description);
 
 /**
  * Unregister an application in the daemon.
@@ -387,17 +387,17 @@ int dlt_unregister_app(void);
  * Register a context in the daemon.
  * This function has to be called before first usage of the context.
  * @param handle pointer to an object containing information about one special logging context
- * @param contextid four byte long character array with the context id
+ * @param threadid four byte long character array with the thread id
  * @param description long name of the context
  * @return negative value if there was an error
  */
-int dlt_register_context(DltContext *handle, const char *contextid, const char * description);
+int dlt_register_context(DltContext *handle, const char *threadid, const char * description);
 
 /**
  * Register a context in the daemon with pre-defined log level and pre-defined trace status.
  * This function has to be called before first usage of the context.
  * @param handle pointer to an object containing information about one special logging context
- * @param contextid four byte long character array with the context id
+ * @param threadid four byte long character array with the thread id
  * @param description long name of the context
  * @param loglevel This is the log level to be pre-set for this context
           (DLT_LOG_DEFAULT is not allowed here)
@@ -405,7 +405,7 @@ int dlt_register_context(DltContext *handle, const char *contextid, const char *
 		  (DLT_TRACE_STATUS_DEFAULT is not allowed here)
  * @return negative value if there was an error
  */
-int dlt_register_context_ll_ts(DltContext *handle, const char *contextid, const char * description, int loglevel, int tracestatus);
+int dlt_register_context_ll_ts(DltContext *handle, const char *threadid, const char * description, int loglevel, int tracestatus);
 
 /**
  * Unregister a context in the DLT daemon.

@@ -39,7 +39,7 @@ public:
     QDltControl(QObject *server);
     ~QDltControl();
 
-    void sendInjection(int index,QString applicationId,QString contextId,int serviceId,QByteArray data);
+    void sendInjection(int index,QString processId,QString threadId,int serviceId,QByteArray data);
     void jumpToMsg(int index);
 
     void newFile(QString filename);
@@ -57,7 +57,7 @@ public:
     bool commandlinemode;
 
 signals:
-    void sendInjectionSignal(int index,QString applicationId,QString contextId,int serviceId,QByteArray data);
+    void sendInjectionSignal(int index,QString processId,QString threadId,int serviceId,QByteArray data);
     void jumpToMsgSignal(int index);
     void newFileSignal(QString filename);
     void openFileSignal(QStringList filenames);

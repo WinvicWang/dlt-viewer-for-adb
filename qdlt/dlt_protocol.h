@@ -75,7 +75,7 @@
  */
 #define DLT_HTYP_UEH  0x01 /**< use extended header */
 #define DLT_HTYP_MSBF 0x02 /**< MSB first */
-#define DLT_HTYP_WEID 0x04 /**< with ECU ID */
+#define DLT_HTYP_WEID 0x04 /**< with Tag */
 #define DLT_HTYP_WSID 0x08 /**< with session ID */
 #define DLT_HTYP_WTMS 0x10 /**< with timestamp */
 #define DLT_HTYP_VERS 0xe0 /**< version number, 0x1 */
@@ -178,7 +178,7 @@
 #define DLT_SERVICE_ID_SET_MESSAGE_FILTERING           0x0A /**< Service ID: Set message filtering */
 #define DLT_SERVICE_ID_SET_TIMING_PACKETS              0x0B /**< Service ID: Set timing packets */
 #define DLT_SERVICE_ID_GET_LOCAL_TIME                  0x0C /**< Service ID: Get local time */
-#define DLT_SERVICE_ID_USE_ECU_ID                      0x0D /**< Service ID: Use ECU id */
+#define DLT_SERVICE_ID_USE_TAG                      0x0D /**< Service ID: Use Tag */
 #define DLT_SERVICE_ID_USE_SESSION_ID                  0x0E /**< Service ID: Use session id */
 #define DLT_SERVICE_ID_USE_TIMESTAMP                   0x0F /**< Service ID: Use timestamp */
 #define DLT_SERVICE_ID_USE_EXTENDED_HEADER             0x10 /**< Service ID: Use extended header */

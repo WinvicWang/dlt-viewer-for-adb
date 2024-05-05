@@ -46,15 +46,15 @@ public:
     FilterType type;
     QString name;
 
-    QString ecuid;
-    QString apid;
-    QString ctid;
+    QString tag;
+    QString pid;
+    QString tid;
     QString header;
     QString payload;
     QString regex_search;
     QString regex_replace;
 
-    bool enableRegexp_Appid;
+    bool enableRegexp_Procid;
     bool enableRegexp_Context;
     bool enableRegexp_Header;
     bool enableRegexp_Payload;
@@ -63,9 +63,9 @@ public:
     bool ignoreCase_Payload;
 
     bool enableFilter;
-    bool enableEcuid;
-    bool enableApid;
-    bool enableCtid;
+    bool enableTag;
+    bool enablePid;
+    bool enableTid;
     bool enableHeader;
     bool enablePayload;
     bool enableCtrlMsgs;
@@ -85,7 +85,7 @@ public:
     QRegularExpression headerRegularExpression;
     QRegularExpression payloadRegularExpression;
     QRegularExpression contextRegularExpression;
-    QRegularExpression appidRegularExpression;
+    QRegularExpression procidRegularExpression;
 
     //! Constructor.
     /*!

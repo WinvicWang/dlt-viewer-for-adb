@@ -89,16 +89,16 @@ void DltViewerPlugin::selectedIdxMsg(int index, QDltMsg &msg) {
     text += QString("<h3>Header</h3>");
     text += QString("<table border=\"1\" cellspacing=\"0\" cellheader=\"0\">");
     //qDebug() << text;
-    text += QString("<tr><th>Index</th><th>Time</th><th>Timestamp</th><th>Count</th><th>Ecuid</th><th>Apid</th><th>Ctid</th><th>SessionId</th>");
-    text += QString("<th>Type</th><th>Subtype</th><th>Mode</th><th>Endianness</th><th>#Args</th></tr>");
+    text += QString("<tr><th>Index</th><th>Time</th><th>Timestamp</th><th>Count</th><th>Tag</th><th>Pid</th><th>Tid</th><th>SessionId</th>");
+    text += QString("<th>Type</th><th>LogLevel</th><th>Mode</th><th>Endianness</th><th>#Args</th></tr>");
     //text += QString("<tr><td>%1</td>").arg(dltFile->getMsgFilterPos(index));
     text += QString("<tr><td>%1</td>").arg(index);
     text += QString("<td>%1.%2</td>").arg(msg.getTimeString()).arg(msg.getMicroseconds(),6,10,QLatin1Char('0'));
     text += QString("<td>%1.%2</td>").arg(msg.getTimestamp()/10000).arg(msg.getTimestamp()%10000,4,10,QLatin1Char('0'));
     text += QString("<td>%1</td>").arg(msg.getMessageCounter());
-    text += QString("<td>%1</td>").arg(msg.getEcuid());
-    text += QString("<td>%1</td>").arg(msg.getApid());
-    text += QString("<td>%1</td>").arg(msg.getCtid());
+    text += QString("<td>%1</td>").arg(msg.getTag());
+    text += QString("<td>%1</td>").arg(msg.getPid());
+    text += QString("<td>%1</td>").arg(msg.getTid());
     text += QString("<td>%1</td>").arg(msg.getSessionid());
     text += QString("<td>%1</td>").arg(msg.getTypeString());
     text += QString("<td>%1</td>").arg(msg.getSubtypeString());
@@ -155,8 +155,8 @@ void DltViewerPlugin::selectedIdxMsg(int index, QDltMsg &msg) {
     {
         text += QString("<h4>Base Header</h4>");
         text += QString("With Session Id: %1<br>").arg(msg.getWithSessionId());
-        text += QString("With App Context Id: %1<br>").arg(msg.getWithAppContextId());
-        text += QString("With Ecu Id: %1<br>").arg(msg.getWithEcuId());
+        text += QString("With App Thread Id: %1<br>").arg(msg.getWithAppThreadId());
+        text += QString("With Tag: %1<br>").arg(msg.getWithtag());
         text += QString("With Message Info: %1<br>").arg(msg.getWithHFMessageInfo());
         text += QString("With Number Of Arguments: %1<br>").arg(msg.getWithHFNumberOfArguments());
         text += QString("With Timestamp: %1<br>").arg(msg.getWithHFTimestamp());
@@ -198,14 +198,14 @@ void DltViewerPlugin::selectedIdxMsg(int index, QDltMsg &msg) {
             text += QString("Message Id: %1<br>").arg(msg.getMessageId());
         }
         text += QString("<h4>Extension Header</h4>");
-        if(msg.getWithEcuId())
+        if(msg.getWithtag())
         {
-            text += QString("ECU Id: %1<br>").arg(msg.getEcuid());
+            text += QString("Tag: %1<br>").arg(msg.getTag());
         }
-        if(msg.getWithAppContextId())
+        if(msg.getWithAppThreadId())
         {
-            text += QString("App Id: %1<br>").arg(msg.getApid());
-            text += QString("Ctx Id: %1<br>").arg(msg.getCtid());
+            text += QString("Process Id: %1<br>").arg(msg.getPid());
+            text += QString("Ctx Id: %1<br>").arg(msg.getTid());
         }
         if(msg.getWithSessionId())
         {

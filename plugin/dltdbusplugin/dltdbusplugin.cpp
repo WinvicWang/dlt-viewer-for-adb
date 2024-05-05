@@ -18,10 +18,10 @@
  * @licence end@
  */
  /*  Change log
- *  12.04.2016 Gernot Wirschal added checking of APID in function checkIfDBusMsg
+ *  12.04.2016 Gernot Wirschal added checking of PID in function checkIfDBusMsg
  *                             to avoid overwriting of SomeIP messages
  *  21.09.2016 Gernot Wirschal change loadConfig to parse xml file containing
- *                             APID/CTID pairs which are supposed to be decoded
+ *                             PID/TID pairs which are supposed to be decoded
  *                             as DBUS messages.
  */
 
@@ -106,12 +106,12 @@ bool DltDBusPlugin::loadConfig(QString filename)
 
  if ( filename.length() <= 0 )
  {
-     // set the default config according to COVESA APID/CTID
+     // set the default config according to COVESA PID/TID
      // as given in dlt-dbus.conf on the logging device
      //qDebug()<< "Set default configuration";
-     logid[0].apid=QString("DBUS");
-     logid[0].ctid=QString("ALL");
-     dbus_mesg_identifiers << logid[0].apid << logid[0].ctid;
+     logid[0].pid=QString("DBUS");
+     logid[0].tid=QString("ALL");
+     dbus_mesg_identifiers << logid[0].pid << logid[0].tid;
      numberof_valid_logids = 1;
      config_is_loaded = true;
      return true;
@@ -133,35 +133,35 @@ bool DltDBusPlugin::loadConfig(QString filename)
            {
               i++;
            }
-           else if(xml.name() == QString("APID"))
+           else if(xml.name() == QString("PID"))
            {
               if ( i>= 0)
                {
                temp1 = xml.readElementText();
                if ( check_logid( temp1, i ) == 0 )
                 {
-                   logid[i].apid = temp1;
+                   logid[i].pid = temp1;
                 }
                else // logid is not correct
                {
-                 //qDebug()<< "Something wrong with APID";
+                 //qDebug()<< "Something wrong with PID";
                  xmlcontentinvalid=1;
                  break;
                }
               }
-           } // is APID
-           else if(xml.name() == QString("CTID"))
+           } // is PID
+           else if(xml.name() == QString("TID"))
            {
                if ( i>= 0)
                 {
                 temp1 = xml.readElementText();
                 if ( check_logid( temp1, i ) == 0 )
                  {
-                    logid[i].ctid = temp1;
+                    logid[i].tid = temp1;
                  }
                 else // logid is not correct
                 {
-                  //qDebug()<< "Something wrong with CTID";
+                  //qDebug()<< "Something wrong with TID";
                   xmlcontentinvalid=1;
                   break;
                 }
@@ -219,7 +219,7 @@ if ( xmlcontentinvalid == 0 )
 {
  for (j=0;j<=i;j++)
  {
-     dbus_mesg_identifiers << logid[j].apid << logid[j].ctid;
+     dbus_mesg_identifiers << logid[j].pid << logid[j].tid;
      numberof_valid_logids = j;
  }
 }
@@ -675,11 +675,11 @@ bool DltDBusPlugin::checkIfDBusMsg(QDltMsg &msg)
         return false;
     }
 
-    // going through the list of APID/CTID pairs to determine "DBUS messages"
+    // going through the list of PID/TID pairs to determine "DBUS messages"
 
     while ( i <= numberof_valid_logids )
     {
-       if ((msg.getApid() == logid[i].apid) &&  (msg.getCtid() == logid[i].ctid) )
+       if ((msg.getPid() == logid[i].pid) &&  (msg.getTid() == logid[i].tid) )
        {
           hit = 1;
           break;

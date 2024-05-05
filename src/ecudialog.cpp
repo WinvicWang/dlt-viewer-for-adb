@@ -96,6 +96,7 @@ void EcuDialog::setData(EcuItem &item)
     ui->comboBoxPortIP_UDP->setEditText(QString("%1").arg(item.getUdpport()));
     ui->comboBoxNetworkIF->setEditText(QString("%1").arg(item.getEthIF()));
     ui->comboBoxPortSerial->setEditText(item.getPort());
+    ui->lineEdit_adbId->setText(item.adbId);
 
     ui->comboBoxBaudrate->setCurrentIndex(ui->comboBoxBaudrate->count()-1);
     for(int i=0; i<ui->comboBoxBaudrate->count(); i++)
@@ -150,6 +151,10 @@ QString EcuDialog::description()
 int EcuDialog::interfacetype()
 {
     return  ui->comboBoxInterface->currentIndex();
+}
+
+QString EcuDialog::adbId(){
+    return  ui->lineEdit_adbId->text();
 }
 
 QString EcuDialog::hostname()
@@ -281,7 +286,7 @@ void EcuDialog::setSerialPortList()
     ui->comboBoxPortSerial->clear();
 
     QList<QSerialPortInfo> 	availablePorts  = QSerialPortInfo::availablePorts();
-    qDebug() << "portName" << "description" << "manufacturer" << "serialNumber" << "productIdentifier" << "vendorIdentifier" << "systemLocation";
+    qDebug() << "portName" << "description" << "manufacturer" << "serialNumber" << "produtcIdentifier" << "vendorIdentifier" << "systemLocation";
     for(int num = 0; num<availablePorts.length();num++)
     {
         qDebug() << availablePorts[num].portName() << availablePorts[num].description() << availablePorts[num].manufacturer() << availablePorts[num].serialNumber() << availablePorts[num].productIdentifier() << availablePorts[num].vendorIdentifier() << availablePorts[num].systemLocation();
@@ -323,6 +328,7 @@ void EcuDialog::setMulticastAddresses(QStringList mcaddresses)
 
 void EcuDialog::setDialogToEcuItem(EcuItem *item)
 {
+    item->adbId = this->adbId();
     item->id = this->id();
     item->description = this->description();
     item->interfacetype = this->interfacetype();
@@ -377,11 +383,19 @@ void EcuDialog::on_comboBoxInterface_currentIndexChanged(int index)
 {
     switch(index)
     {
-        case EcuItem::INTERFACETYPE_TCP:
-            //we have TCP set -> disable serial, enable TCP
+        case EcuItem::INTERFACETYPE_ADB:
+            //we have ADB set -> disable serial, enable TCP UDP
             ui->tabWidget->setTabEnabled(1,true);
             ui->tabWidget->setTabEnabled(2,false);
             ui->tabWidget->setTabEnabled(3,false);
+            ui->tabWidget->setTabEnabled(4,false);
+        break;
+        case EcuItem::INTERFACETYPE_TCP:
+            //we have TCP set -> disable serial, enable TCP
+            ui->tabWidget->setTabEnabled(1,false);
+            ui->tabWidget->setTabEnabled(2,true);
+            ui->tabWidget->setTabEnabled(3,false);
+            ui->tabWidget->setTabEnabled(4,false);
             ui->comboBoxNetworkIF->setVisible(false);
             ui->checkBoxMulticast->setVisible(false);
             ui->label_3->setText(QString("Hostname:"));
@@ -391,8 +405,9 @@ void EcuDialog::on_comboBoxInterface_currentIndexChanged(int index)
         case EcuItem::INTERFACETYPE_UDP:
             //we have UDP set -> disable serial, enable UDP
             ui->tabWidget->setTabEnabled(1,false);
-            ui->tabWidget->setTabEnabled(2,true);
-            ui->tabWidget->setTabEnabled(3,false);
+            ui->tabWidget->setTabEnabled(2,false);
+            ui->tabWidget->setTabEnabled(3,true);
+            ui->tabWidget->setTabEnabled(4,false);
             ui->comboBoxNetworkIF->setVisible(true);
             ui->checkBoxMulticast->setVisible(true);
             ui->label_UDP_mcastadress->setToolTip(QString("Multicast IP address to subscribe to. \nSelect <none> for unicast."));
@@ -403,7 +418,8 @@ void EcuDialog::on_comboBoxInterface_currentIndexChanged(int index)
         case EcuItem::INTERFACETYPE_SERIAL_DLT:
             ui->tabWidget->setTabEnabled(1,false);
             ui->tabWidget->setTabEnabled(2,false);
-            ui->tabWidget->setTabEnabled(3,true);
+            ui->tabWidget->setTabEnabled(3,false);
+            ui->tabWidget->setTabEnabled(4,true);
             ui->checkBoxSendSerialHeaderSerial->setVisible(true);
             ui->checkBoxSyncToSerialHeaderSerial->setVisible(true);
             break;
@@ -411,7 +427,8 @@ void EcuDialog::on_comboBoxInterface_currentIndexChanged(int index)
         case EcuItem::INTERFACETYPE_SERIAL_ASCII:
             ui->tabWidget->setTabEnabled(1,false);
             ui->tabWidget->setTabEnabled(2,false);
-            ui->tabWidget->setTabEnabled(3,true);
+            ui->tabWidget->setTabEnabled(3,false);
+            ui->tabWidget->setTabEnabled(4,true);
             ui->checkBoxSendSerialHeaderSerial->setVisible(false);
             ui->checkBoxSyncToSerialHeaderSerial->setVisible(false);
             break;

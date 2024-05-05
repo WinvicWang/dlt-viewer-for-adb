@@ -17,29 +17,29 @@ QString FieldNames::getName(Fields cn, QDltSettingsManager *settings)
         return QString("Timestamp");
     case Counter:
         return QString("Count");
-    case EcuId:
-        return QString("Ecuid");
-    case AppId:
+    case tag:
+        return QString("Tag");
+    case ProcId:
         if(settings == NULL)
         {
-            return QString("Apid");
+            return QString("Pid");
         }
-        switch(settings->showApIdDesc){
+        switch(settings->showPidDesc){
         case 0:
-             return QString("Apid");
+             return QString("Pid");
         case 1:
-             return QString("Apid Desc");
+             return QString("Pid Desc");
         }
-    case ContextId:
+    case ThreadId:
         if(settings == NULL)
         {
-            return QString("Ctid");
+            return QString("Tid");
         }
-        switch(settings->showCtIdDesc){
+        switch(settings->showTidDesc){
         case 0:
-             return QString("Ctid");
+             return QString("Tid");
         case 1:
-             return QString("Ctid Desc");
+             return QString("Tid Desc");
         }
     case SessionId:
         if(settings == NULL)
@@ -54,8 +54,8 @@ QString FieldNames::getName(Fields cn, QDltSettingsManager *settings)
         }
     case Type:
         return QString("Type");
-    case Subtype:
-        return QString("Subtype");
+    case LogLevel:
+        return QString("LogLevel");
     case Mode:
         return QString("Mode");
     case ArgCount:
@@ -84,12 +84,12 @@ int FieldNames::getColumnWidth(Fields cn, QDltSettingsManager *settings)
     case FieldNames::Time        : width= 150;break;
     case FieldNames::TimeStamp   : width=  70;break;
     case FieldNames::Counter     : width=  40;break;
-    case FieldNames::EcuId       : width=  40;break;
-    case FieldNames::AppId       : width=  40;break;
-    case FieldNames::ContextId   : width=  40;break;
+    case FieldNames::tag       : width=  40;break;
+    case FieldNames::ProcId       : width=  40;break;
+    case FieldNames::ThreadId   : width=  40;break;
     case FieldNames::SessionId   : width=  70;break;
     case FieldNames::Type        : width=  50;break;
-    case FieldNames::Subtype     : width=  50;break;
+    case FieldNames::LogLevel     : width=  50;break;
     case FieldNames::Mode        : width=  50;break;
     case FieldNames::ArgCount    : width=  40;break;
     case FieldNames::Payload     : width=1200;break;
@@ -107,23 +107,23 @@ QVariant FieldNames::getColumnAlignment(Fields cn, QDltSettingsManager *settings
         case FieldNames::Time:          return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
         case FieldNames::TimeStamp:     return QVariant(Qt::AlignRight  | Qt::AlignVCenter);
         case FieldNames::Counter:       return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
-        case FieldNames::EcuId:         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
-        case FieldNames::AppId:
-            switch(settings->showApIdDesc)
+        case FieldNames::tag:         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
+        case FieldNames::ProcId:
+            switch(settings->showPidDesc)
             {
             case 0:  return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
             case 1:  return QVariant(Qt::AlignLeft   | Qt::AlignVCenter);
             default: return QVariant(Qt::AlignLeft   | Qt::AlignVCenter);
             }
-        case FieldNames::ContextId:
-            switch(settings->showCtIdDesc)
+        case FieldNames::ThreadId:
+            switch(settings->showTidDesc)
             {
             case 0:  return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
             case 1:  return QVariant(Qt::AlignLeft   | Qt::AlignVCenter);
             default: return QVariant(Qt::AlignLeft   | Qt::AlignVCenter);
             }
         case FieldNames::Type:           return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
-        case FieldNames::Subtype:        return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
+        case FieldNames::LogLevel:        return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
         case FieldNames::Mode:           return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
         case FieldNames::ArgCount:       return QVariant(Qt::AlignRight  | Qt::AlignVCenter);
         case FieldNames::Payload:        return QVariant(Qt::AlignLeft   | Qt::AlignVCenter);
@@ -141,12 +141,12 @@ bool FieldNames::getColumnShown(Fields cn,QDltSettingsManager *settings)
         case(FieldNames::Time        ):return  settings->showTime      ;
         case(FieldNames::TimeStamp   ):return  settings->showTimestamp ;
         case(FieldNames::Counter     ):return  settings->showCount     ;
-        case(FieldNames::EcuId       ):return  settings->showEcuId     ;
-        case(FieldNames::AppId       ):return  settings->showApId      ;
-        case(FieldNames::ContextId   ):return  settings->showCtId      ;
+        case(FieldNames::tag       ):return  settings->showtag     ;
+        case(FieldNames::ProcId       ):return  settings->showPid      ;
+        case(FieldNames::ThreadId   ):return  settings->showTid      ;
         case(FieldNames::SessionId   ):return  settings->showSessionId ;
         case(FieldNames::Type        ):return  settings->showType      ;
-        case(FieldNames::Subtype     ):return  settings->showSubtype   ;
+        case(FieldNames::LogLevel     ):return  settings->showLogLevel   ;
         case(FieldNames::Mode        ):return  settings->showMode      ;
         case(FieldNames::ArgCount    ):return  settings->showNoar      ;
         case(FieldNames::Payload     ):return  settings->showPayload   ;

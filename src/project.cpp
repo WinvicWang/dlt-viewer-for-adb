@@ -39,13 +39,13 @@ EcuItem::EcuItem(QTreeWidgetItem *parent)
     /* initialise receive buffer and message*/
     id = default_id;
     description = "A new ECU";
-    interfacetype = INTERFACETYPE_TCP; /* default TCP */
+    interfacetype = INTERFACETYPE_ADB; /* default TCP */
     hostname = "localhost";
     mcastIP = "<none>";
     ipport = DLT_DAEMON_TCP_PORT;
     udpport = DLT_DAEMON_UDP_PORT;
     baudrate = QSerialPort::Baud115200; /* default 115200 */
-    loglevel = DLT_LOG_INFO;
+    loglevel = DLT_LOG_VERBOSE;
     tracestatus = DLT_TRACE_STATUS_OFF;
     verbosemode = 1;
     sendSerialHeaderIp = false;
@@ -62,6 +62,7 @@ EcuItem::EcuItem(QTreeWidgetItem *parent)
     totalBytesRcvd = 0;
     totalBytesRcvdLastTimeout = 0;
     is_multicast = false;
+    adbId = "default";
 
     tryToConnect = false;
     connected = false;
@@ -358,14 +359,14 @@ FilterItem::FilterItem(QTreeWidgetItem *parent)
     filter.name = "New Filter";
 
     setCheckState(0,Qt::Checked);
-    filter.enableRegexp_Appid = false;
+    filter.enableRegexp_Procid = false;
     filter.enableRegexp_Context = false;
     filter.enableRegexp_Header = false;
     filter.enableRegexp_Payload = false;
     filter.enableFilter = false;
-    filter.enableEcuid = false;
-    filter.enableApid = false;
-    filter.enableCtid = false;
+    filter.enableTag = false;
+    filter.enablePid = false;
+    filter.enableTid = false;
     filter.enableHeader = false;
     filter.enablePayload = false;
     filter.enableLogLevelMax = false;
@@ -418,7 +419,7 @@ void FilterItem::update()
         break;
     }
 
-    if(filter.enableRegexp_Appid || filter.enableRegexp_Context || filter.enableRegexp_Header || filter.enableRegexp_Payload)
+    if(filter.enableRegexp_Procid || filter.enableRegexp_Context || filter.enableRegexp_Header || filter.enableRegexp_Payload)
     {
         text += "RegExp";
     }
@@ -429,14 +430,14 @@ void FilterItem::update()
         setCheckState(0,Qt::Unchecked);
     }
 
-    if(filter.enableEcuid ) {
-        text += QString("%1 ").arg(filter.ecuid);
+    if(filter.enableTag ) {
+        text += QString("%1 ").arg(filter.tag);
     }
-    if(filter.enableApid ) {
-        text += QString("%1 ").arg(filter.apid);
+    if(filter.enablePid ) {
+        text += QString("%1 ").arg(filter.pid);
     }
-    if(filter.enableCtid ) {
-        text += QString("%1 ").arg(filter.ctid);
+    if(filter.enableTid ) {
+        text += QString("%1 ").arg(filter.tid);
     }
     if(filter.enableHeader ) {
         text += QString("%1 ").arg(filter.header);

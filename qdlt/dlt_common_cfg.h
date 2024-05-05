@@ -87,9 +87,9 @@
    this is the maximum number of characters to be printed out */
 #define DLT_COMMON_ASCII_LIMIT_MAX_CHARS 20
 
-/* This defines the dummy ECU ID set in storage header during import
+/* This defines the dummy Tag set in storage header during import
    of a message from a DLT file in RAW format (without storage header) */
-#define DLT_COMMON_DUMMY_ECUID "ECU"
+#define DLT_COMMON_DUMMY_TAG "ECU"
 
 
 /************************/

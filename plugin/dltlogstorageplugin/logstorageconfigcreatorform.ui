@@ -181,28 +181,28 @@
            <item row="0" column="0">
             <widget class="QLabel" name="label">
              <property name="toolTip">
-              <string>Application Identifier</string>
+              <string>Process Identifier</string>
              </property>
              <property name="text">
-              <string>Apid:</string>
+              <string>Pid:</string>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEdit_apid"/>
+            <widget class="QLineEdit" name="lineEdit_pid"/>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_2">
              <property name="toolTip">
-              <string>Context Identifier</string>
+              <string>Thread Identifier</string>
              </property>
              <property name="text">
-              <string>Ctid:</string>
+              <string>Tid:</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEdit_ctid"/>
+            <widget class="QLineEdit" name="lineEdit_tid"/>
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="label_3">

@@ -38,7 +38,7 @@ const char *qDltEndianness[] = {"little-endian","big-endian"};
 const char *qDltTypeInfo[] = {"String","Bool","SignedInteger","UnsignedInteger","Float","RawData","TraceInfo","Utf8String"};
 const char *qDltCtrlServiceId[] = {"","set_log_level","set_trace_status","get_log_info","get_default_log_level","store_config","reset_to_factory_default",
                              "set_com_interface_status","set_com_interface_max_bandwidth","set_verbose_mode","set_message_filtering","set_timing_packets",
-                             "get_local_time","use_ecu_id","use_session_id","use_timestamp","use_extended_header","set_default_log_level","set_default_trace_status",
+                             "get_local_time","use_tag","use_session_id","use_timestamp","use_extended_header","set_default_log_level","set_default_trace_status",
                              "get_software_version","message_buffer_overflow"};
 const char *qDltCtrlReturnType [] = {"ok","not_supported","error","3","4","5","6","7","no_matching_context_id"};
 
