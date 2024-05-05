@@ -1,0 +1,15 @@
+.gitconfig
+CMakeLists.txt.user
+*.pro.user
+build/
+.project
+Makefile
+buildlib/
+release/
+.cproject
+*.pro.user*
+.settings
+*.orig
+*~
+.idea
+
