@@ -104,6 +104,9 @@ public:
     QUdpSocket udpsocket;
     QAbstractSocket * socket;
     QProcess process;
+    bool adbFromFile = false;
+    QFile adbFile;
+    QString adbData;
 
     QSerialPort *m_serialport;
 

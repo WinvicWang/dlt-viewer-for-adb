@@ -29,7 +29,7 @@ extern "C"
 }
 
 const char *qDltMessageType[] = {"log","app_trace","nw_trace","control","","","",""};
-const char *qDltLogInfo[] = {"","fatal","error","warn","info","debug","verbose","","","","","","","","",""};
+const char *qDltLogInfo[] = {"","F","E","W","I","D","V","","","","","","","","",""};
 const char *qDltTraceType[] = {"","variable","func_in","func_out","state","vfb","","","","","","","","","",""};
 const char *qDltNwTraceType[] = {"","ipc","can","flexray","most","vfb","","","","","","","","","",""};
 const char *qDltControlType[] = {"","request","response","time","","","","","","","","","","","",""};

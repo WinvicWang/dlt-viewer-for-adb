@@ -122,7 +122,7 @@ QString QDltMsg::getTimeString() const
     struct tm *time_tm;
     time_tm = localtime(&time);
     if(time_tm)
-        strftime(strtime, 256, "%Y/%m/%d %H:%M:%S", time_tm);
+        strftime(strtime, 256, "%m-%d %H:%M:%S", time_tm);
     return QString(strtime);
 }
 
@@ -1108,16 +1108,17 @@ QString QDltMsg::toStringHeader() const
     text.reserve(1024);
 
     text += QString("%1.%2").arg(getTimeString()).arg(getMicroseconds(),6,10,QLatin1Char('0'));
-    text += QString(" %1.%2").arg(getTimestamp()/10000).arg(getTimestamp()%10000,4,10,QLatin1Char('0'));
-    text += QString(" %1").arg(getMessageCounter());
-    text += QString(" %1").arg(getTag());
+    // text += QString(" %1.%2").arg(getTimestamp()/10000).arg(getTimestamp()%10000,4,10,QLatin1Char('0'));
+    // text += QString(" %1").arg(getMessageCounter());
     text += QString(" %1").arg(getPid());
     text += QString(" %1").arg(getTid());
-    text += QString(" %1").arg(getSessionid());
-    text += QString(" %2").arg(getTypeString());
+    // text += QString(" %1").arg(getSessionid());
+    // text += QString(" %2").arg(getTypeString());
     text += QString(" %2").arg(getSubtypeString());
-    text += QString(" %2").arg(getModeString());
-    text += QString(" %1").arg(getNumberOfArguments());
+    text += QString(" %1").arg(getTag());
+    text += QString(":");
+    // text += QString(" %2").arg(getModeString());
+    // text += QString(" %1").arg(getNumberOfArguments());
 
     return text;
 }

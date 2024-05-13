@@ -252,14 +252,14 @@ bool DltExporter::exportMsg(unsigned long int num, QDltMsg &msg, QByteArray &buf
         /* get message ASCII text */
         if(exportFormat != DltExporter::FormatClipboardPayloadOnly)
         {
-            if(exportSelection == DltExporter::SelectionAll)
-                text += QString("%1 ").arg(num);
-            else if(exportSelection == DltExporter::SelectionFiltered)
-                text += QString("%1 ").arg(from->getMsgFilterPos(num));
-            else if(exportSelection == DltExporter::SelectionSelected)
-                text += QString("%1 ").arg(from->getMsgFilterPos(selectedRows[num]));
-            else
-                return false;
+            // if(exportSelection == DltExporter::SelectionAll)
+            //     text += QString("%1 ").arg(num);
+            // else if(exportSelection == DltExporter::SelectionFiltered)
+            //     text += QString("%1 ").arg(from->getMsgFilterPos(num));
+            // else if(exportSelection == DltExporter::SelectionSelected)
+            //     text += QString("%1 ").arg(from->getMsgFilterPos(selectedRows[num]));
+            // else
+            //     return false;
             text += msg.toStringHeader();
             text += " ";
         }

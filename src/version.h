@@ -24,10 +24,10 @@
 /* this kind of change is tracked in the settings dialogr */
 /* for other bugfixes and not major feature enhancement just use patch level */
 #define PACKAGE_VERSION_STATE ""
-#define PACKAGE_MAJOR_VERSION 2
-#define PACKAGE_MINOR_VERSION 24
+#define PACKAGE_MAJOR_VERSION 1
+#define PACKAGE_MINOR_VERSION 4
 #define PACKAGE_PATCH_LEVEL 0
-#define PACKAGE_VERSION "2.24.0"
+#define PACKAGE_VERSION "1.4.0"
 #define PACKAGE_REVISION ""
 #define PACKAGE_DESCRIPTION "DLT Viewer"
 #define DLT_SUPPORT_MAIL_ADDRESS ""

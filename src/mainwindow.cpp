@@ -112,6 +112,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initView();
 
+    initFullLogTable();
+
     applySettings();
 
     initSignalConnections();
@@ -148,6 +150,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionSort_By_Timestamp->setChecked(ui->checkBoxSortByTimestamp->isChecked());
     ui->actionProject->setChecked(ui->dockWidgetContents->isVisible());
     ui->actionSearch_Results->setChecked(ui->dockWidgetSearchIndex->isVisible());
+    ui->actionFullLog->setChecked(ui->dockWidgetFullLog->isFullScreen());
 
     newCompleter = new QCompleter(&m_CompleterModel,this);
 
@@ -160,6 +163,42 @@ MainWindow::MainWindow(QWidget *parent) :
         qDebug() << "Start minimzed as defined in the settings";
         this->setWindowState(Qt::WindowMinimized);
     }
+
+    ui->tabWidget->setTabVisible(0, false);
+    ui->tabWidget->setTabVisible(2, false);
+    ui->tabWidget->setCurrentIndex(1);
+
+    ui->actionSort_By_Timestamp->setVisible(false);
+    ui->actionToggle_SortByTimeEnabled->setVisible(false);
+
+
+    ui->pluginsEnabled->setVisible(false);
+    ui->checkBoxSortByTime->setVisible(false);
+    ui->checkBoxSortByTimestamp->setVisible(false);
+    ui->actionToggle_PluginsEnabled->setVisible(false);
+    ui->checkBoxFilterRange->setVisible(false);
+    ui->lineEditFilterStart->setVisible(false);
+    ui->lineEditFilterEnd->setVisible(false);
+    ui->comboBoxFilterSelection->setVisible(false);
+    ui->pushButtonDefaultFilterUpdateCache->setVisible(false);
+    ui->action_menuDLT_Get_Default_Log_Level->setVisible(false);
+    ui->action_menuDLT_Set_Default_Log_Level->setVisible(false);
+    ui->action_menuDLT_Get_Log_Info->setVisible(false);
+    ui->action_menuDLT_Set_Log_Level->setVisible(false);
+    ui->action_menuDLT_Set_All_Log_Levels->setVisible(false);
+    ui->action_menuDLT_Send_Injection->setVisible(false);
+    ui->action_menuDLT_Get_Software_Version->setVisible(false);
+    ui->action_menuDLT_Get_Local_Time_2->setVisible(false);
+    ui->action_menuConfig_Application_Add->setVisible(false);
+    ui->action_menuConfig_Application_Edit->setVisible(false);
+    ui->action_menuConfig_Application_Delete->setVisible(false);
+    ui->action_menuConfig_Context_Add->setVisible(false);
+    ui->action_menuConfig_Context_Edit->setVisible(false);
+    ui->action_menuConfig_Context_Delete->setVisible(false);
+    ui->action_menuPlugin_Edit->setVisible(false);
+    ui->action_menuPlugin_Show->setVisible(false);
+    ui->action_menuPlugin_Hide->setVisible(false);
+    ui->action_menuPlugin_Disable->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -185,6 +224,16 @@ MainWindow::~MainWindow()
         }
     }
 
+    for(int num = 0; num < project.ecu->topLevelItemCount (); num++)
+    {
+        EcuItem *ecuitem = (EcuItem*)project.ecu->topLevelItem(num);
+        if (ecuitem->interfacetype == EcuItem::INTERFACETYPE_ADB) {
+            QObject::disconnect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
+            ecuitem->process.close();
+            ecuitem->process.reset();
+        }
+    }
+
 
     if(( settings->appendDateTime == 1) && (outputfile.size() != 0))
     {
@@ -198,6 +247,7 @@ MainWindow::~MainWindow()
 
         // rename old file
         qfile.close();
+        qfileFullLog.close();
         outputfile.flush();
         outputfile.close();
         bool result = outputfile.rename(info.absoluteFilePath(), infoNew.absoluteFilePath());
@@ -351,12 +401,14 @@ void MainWindow::initView()
     project.ecu->setStyleSheet("QTreeWidget:focus { border-color:lightgray; border-style:solid; border-width:1px; }");
     ui->tableView->setStyleSheet("QTableView:focus { border-color:lightgray; border-style:solid; border-width:1px; }");
     ui->tableView_SearchIndex->setStyleSheet("QTableView:focus { border-color:lightgray; border-style:solid; border-width:1px; }");
+    ui->tableView_fullLog->setStyleSheet("QTableView:focus { border-color:lightgray; border-style:solid; border-width:1px; }");
 
     if (QDltSettingsManager::UI_Colour::UI_Dark == QDltSettingsManager::getInstance()->uiColour)
     {
         project.ecu->setStyleSheet("QTreeWidget:focus { border-color:#7f7f7f; border-style:solid; border-width:1px; }");
         ui->tableView->setStyleSheet("QTableView:focus { border-color:#7f7f7f; border-style:solid; border-width:1px; }");
         ui->tableView_SearchIndex->setStyleSheet("QTableView:focus { border-color:#7f7f7f; border-style:solid; border-width:1px; }");
+        ui->tableView_fullLog->setStyleSheet("QTableView:focus { border-color:#7f7f7f; border-style:solid; border-width:1px; }");
     }
 
     /* update default filter selection */
@@ -525,6 +577,7 @@ void MainWindow::initSignalConnections()
     connect(m_shortcut_searchprev, SIGNAL(activated()), searchDlg, SLOT( on_pushButtonPrevious_clicked() ) );
 
     connect(ui->tableView->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(sectionInTableDoubleClicked(int)));
+    connect(ui->tableView, SIGNAL( doubleClicked (QModelIndex) ), this, SLOT( filterResult_cellSelected( QModelIndex ) ) );
 
     //for search result table
     connect(searchDlg, SIGNAL(refreshedSearchIndex()), this, SLOT(searchTableRenewed()));
@@ -580,6 +633,35 @@ void MainWindow::initSearchTable()
 
 }
 
+
+void MainWindow::initFullLogTable()
+{
+    /* initialise DLT Search handling */
+    m_fullLogTableModel = new TableModel("Search Index Mainwindow");
+    m_fullLogTableModel->qfile = &qfileFullLog;
+    m_fullLogTableModel->project = &project;
+    m_fullLogTableModel->pluginManager = &pluginManager;
+
+    m_fullLogTable = ui->tableView_fullLog;
+    m_fullLogTable->setModel(m_fullLogTableModel);
+
+    m_fullLogTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    /* With Autoscroll= false the tableview doesn't jump to the right edge,
+        for example, if the payload column is stretched to full size */
+    m_fullLogTable->setAutoScroll(false);
+
+    m_fullLogTable->verticalHeader()->setVisible(false);
+    m_fullLogTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+
+    /* set table size and en */
+   for  (int col=0;col <= m_fullLogTable->model()->columnCount();col++)
+   {
+     m_fullLogTable->setColumnWidth(col,FieldNames::getColumnWidth((FieldNames::Fields)col,settings));
+   }
+
+}
+
 void MainWindow::initFileHandling()
 {
     /* Initialize dlt-file indexer  */
@@ -620,7 +702,7 @@ void MainWindow::initFileHandling()
     else
     {
         /* Load default project file */
-        this->setWindowTitle(QString("DLT Viewer - ADB Extension - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
+        this->setWindowTitle(QString("DLT Viewer For ADB - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
         if(settings->defaultProjectFile)
         {
             qDebug() << QString("Loading default project %1").arg(settings->defaultProjectFileName);
@@ -889,6 +971,7 @@ void MainWindow::deleteactualFile()
     {
         // Delete created temp file
         qfile.close();
+        qfileFullLog.close();
         outputfile.close();
         if(outputfile.exists() && !outputfile.remove())
         {
@@ -1013,7 +1096,7 @@ void MainWindow::onNewTriggered(QString fileName)
 void MainWindow::on_action_menuFile_Open_triggered()
 {
     QStringList fileNames = QFileDialog::getOpenFileNames(this,
-        tr("Open one or more DLT Log files"), workingDirectory.getDltDirectory(), tr("DLT Files (*.dlt);;All files (*.*)"));
+        tr("Open one or more DLT Log files"), workingDirectory.getDltDirectory(), tr("DLT Files (*.dlt);;ADB Log Files (*.txt);;All files (*.*)"));
 
     if(fileNames.isEmpty())
         return;
@@ -1026,7 +1109,12 @@ void MainWindow::onOpenTriggered(QStringList filenames)
 {
     /* change DLT file working directory */
     workingDirectory.setDltDirectory(QFileInfo(filenames[0]).absolutePath());
-    openDltFile(filenames);
+
+    if (filenames.size() == 1 && filenames[0].endsWith(".txt")) {
+        openADBLog(filenames[0]);
+    } else {
+        openDltFile(filenames);
+    }
     outputfileIsFromCLI = false;
     outputfileIsTemporary = false;
 
@@ -1164,6 +1252,54 @@ bool MainWindow::openDltFile(QStringList fileNames)
 
     //qDebug() << "Open files done" << __FILE__ << __LINE__;
     return ret;
+}
+
+bool MainWindow::openADBLog(QString fileName)
+{
+    qDebug() << "Open ADB log";
+
+    on_action_menuFile_Clear_triggered();
+
+    EcuItem ecuitem;
+    ecuitem.tryToConnect = true;
+    ecuitem.connected = true;
+    ecuitem.adbFromFile = true;
+    ecuitem.interfacetype = EcuItem::INTERFACETYPE_ADB;
+
+    ecuitem.update();
+    on_configWidget_itemSelectionChanged();
+
+    ecuitem.totalBytesRcvd = 0;
+    ecuitem.totalBytesRcvdLastTimeout = 0;
+
+    ecuitem.adbFile.setFileName(fileName);
+    if (!ecuitem.adbFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "File open error";
+        ecuitem.connected = false;
+        return false;
+    }
+
+    QProgressDialog progress("Processing...", "Cancel", 0, 100);
+    progress.setWindowModality(Qt::WindowModal);
+
+    int parsedSize = 0;
+    int totalSize = ecuitem.adbFile.size();
+    while(!ecuitem.adbFile.atEnd()) {
+        QByteArray block = ecuitem.adbFile.read(1024*1024); // read 1MB each time
+        QTextStream in(block);
+        ecuitem.adbData = in.readAll();
+        read(&ecuitem);
+
+        parsedSize += block.size();
+        progress.setValue((int)((float)parsedSize*100/totalSize));
+        if (progress.wasCanceled())
+            break;
+    }
+
+    progress.reset();
+    ecuitem.connected = false;
+
+    return true;
 }
 
 void MainWindow::appendDltFile(const QString &fileName)
@@ -1382,6 +1518,15 @@ void MainWindow::exportSelection(bool ascii = true,bool file = false,DltExporter
     exporter.exportMessages(&qfile,0,&pluginManager,format,DltExporter::SelectionSelected,&list);
 }
 
+void MainWindow::exportSelectionFullLog(DltExporter::DltExportFormat format = DltExporter::FormatClipboard)
+{
+    QModelIndexList list = ui->tableView_fullLog->selectionModel()->selection().indexes();
+
+
+    DltExporter exporter;
+    exporter.exportMessages(&qfileFullLog,0,&pluginManager,format,DltExporter::SelectionSelected,&list);
+}
+
 void MainWindow::exportSelection_searchTable(DltExporter::DltExportFormat format = DltExporter::FormatClipboard)
 {
     const QModelIndexList list = ui->tableView_SearchIndex->selectionModel()->selectedRows();
@@ -1583,6 +1728,7 @@ void MainWindow::onSaveAsTriggered(QString fileName)
     workingDirectory.setDltDirectory(QFileInfo(fileName).absolutePath());
 
     qfile.close();
+    qfileFullLog.close();
     outputfile.close();
 
     QFile sourceFile( outputfile.fileName() );
@@ -1792,6 +1938,8 @@ void MainWindow::reloadLogFileFinishIndex()
     // show already unfiltered messages
     tableModel->setForceEmpty(false);
     tableModel->modelChanged();
+    m_fullLogTableModel->setForceEmpty(false);
+    m_fullLogTableModel->modelChanged();
     this->update(); // force update
     restoreSelection();
 
@@ -1832,6 +1980,8 @@ void MainWindow::reloadLogFileFinishFilter()
     // update table
     tableModel->setForceEmpty(false);
     tableModel->modelChanged();
+    m_fullLogTableModel->setForceEmpty(false);
+    m_fullLogTableModel->modelChanged();
     this->update(); // force update
     restoreSelection();
     m_searchtableModel->modelChanged();
@@ -1874,6 +2024,9 @@ void MainWindow::reloadLogFile(bool update, bool multithreaded)
     /* check if in logging only mode, then do not create index */
     tableModel->setLoggingOnlyMode(settings->loggingOnlyMode);
     tableModel->modelChanged();
+
+    m_fullLogTableModel->setLoggingOnlyMode(settings->loggingOnlyMode);
+    m_fullLogTableModel->modelChanged();
 
     if( 0 != settings->loggingOnlyMode )
     {
@@ -1947,6 +2100,8 @@ void MainWindow::reloadLogFile(bool update, bool multithreaded)
     // force empty table
     tableModel->setForceEmpty(true);
     tableModel->modelChanged();
+    m_fullLogTableModel->setForceEmpty(false);
+    m_fullLogTableModel->modelChanged();
 
     // stop last indexing process, if any
     dltIndexer->stop();
@@ -1961,10 +2116,16 @@ void MainWindow::reloadLogFile(bool update, bool multithreaded)
             {
               qDebug() << "ERROR opening file (s)" << openFileNames[num] << __FILE__ << __LINE__;
             }
+            back = qfileFullLog.open(openFileNames[num],num!=0);
+            if ( false == back )
+            {
+              qDebug() << "ERROR opening file full log (s)" << openFileNames[num] << __FILE__ << __LINE__;
+            }
         }
     }
     //qfile.enableFilter(QDltSettingsManager::getInstance()->value("startup/filtersEnabled", true).toBool());
     qfile.enableFilter(false);
+    qfileFullLog.enableFilter(false);
 
     // lock table view
     //ui->tableView->lock();
@@ -2057,6 +2218,8 @@ void MainWindow::applySettings()
     ui->tableView->verticalHeader()->setDefaultSectionSize(settings->sectionSize);
     m_searchresultsTable->setFont(font);
     m_searchresultsTable->verticalHeader()->setDefaultSectionSize(settings->sectionSize);
+    m_fullLogTable->setFont(font);
+    m_fullLogTable->verticalHeader()->setDefaultSectionSize(settings->sectionSize);
 
     for  (int col=0;col <= ui->tableView->model()->columnCount();col++)
     {
@@ -2077,10 +2240,24 @@ void MainWindow::applySettings()
         case(FieldNames::SessionId): m_searchresultsTable->setColumnHidden(col, true);break;
         case(FieldNames::Counter):   m_searchresultsTable->setColumnHidden(col, true);break;
         case(FieldNames::Type):      m_searchresultsTable->setColumnHidden(col, true);break;
-        case(FieldNames::LogLevel):   m_searchresultsTable->setColumnHidden(col, true);break;
+        // case(FieldNames::LogLevel):   m_searchresultsTable->setColumnHidden(col, true);break;
         case(FieldNames::Mode):      m_searchresultsTable->setColumnHidden(col, true);break;
         case(FieldNames::ArgCount):  m_searchresultsTable->setColumnHidden(col, true);break;
         default:m_searchresultsTable->setColumnHidden(col, !(FieldNames::getColumnShown((FieldNames::Fields)col,settings)));break;
+        }
+    }
+    for  (int col=0;col <= m_fullLogTable->model()->columnCount();col++)
+    {
+        switch(col)
+        {
+        //override column visibility here
+        case(FieldNames::SessionId): m_fullLogTable->setColumnHidden(col, true);break;
+        case(FieldNames::Counter):   m_fullLogTable->setColumnHidden(col, true);break;
+        case(FieldNames::Type):      m_fullLogTable->setColumnHidden(col, true);break;
+        // case(FieldNames::LogLevel):   m_searchresultsTable->setColumnHidden(col, true);break;
+        case(FieldNames::Mode):      m_fullLogTable->setColumnHidden(col, true);break;
+        case(FieldNames::ArgCount):  m_fullLogTable->setColumnHidden(col, true);break;
+        default:m_fullLogTable->setColumnHidden(col, !(FieldNames::getColumnShown((FieldNames::Fields)col,settings)));break;
         }
     }
     if ( settings->RefreshRate > 0 )
@@ -2129,6 +2306,8 @@ void MainWindow::on_action_menuFile_Settings_triggered()
         {
             tableModel->setLoggingOnlyMode(settings->loggingOnlyMode);
             tableModel->modelChanged();
+            m_fullLogTableModel->setLoggingOnlyMode(settings->loggingOnlyMode);
+            m_fullLogTableModel->modelChanged();
             /* to remove ?? - in case logging only is disbaled the file is reloaded anyway
             if(false == settings->loggingOnlyMode)
             {
@@ -2142,6 +2321,7 @@ void MainWindow::on_action_menuFile_Settings_triggered()
 
         // update table, perhaps settings changed table, e.g. number of columns
         tableModel->modelChanged();
+        m_fullLogTableModel->modelChanged();
     }
 }
 
@@ -2177,7 +2357,7 @@ void MainWindow::on_action_menuProject_New_triggered()
 
     /* create new project */
 
-    this->setWindowTitle(QString("DLT Viewer - ADB Extension - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
+    this->setWindowTitle(QString("DLT Viewer For ADB - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
     project.Clear();
 
     /* Update the ECU list in control plugins */
@@ -3292,7 +3472,6 @@ void MainWindow::on_action_menuConfig_Disconnect_triggered()
 #define _WORD_BYTE0(x) (uint8_t((x) & 0xFF))
 #define _WORD_BYTE1(x) (uint8_t((x) >> 8))
 #define MIN(x,y) ((x) > (y) ? (y) : (x))
-
 void MainWindow::readAdbData(EcuItem *ecuitem)
 {
     static char g_date[DLT_ID_SIZE];
@@ -3303,21 +3482,37 @@ void MainWindow::readAdbData(EcuItem *ecuitem)
     static char g_tag[DLT_ID_SIZE];
     static char g_content[DLT_MSG_MAX_LENGTH - 6*DLT_ID_SIZE];
 
-    QString output(ecuitem->process.readAll());
-    if (output.size() == 0) {
+    QString inputData;
+    if (ecuitem->adbFromFile) {
+        inputData = ecuitem->adbData;
+    } else {
+        inputData = ecuitem->process.readAll();
+    }
+    if (inputData.size() == 0) {
         return;
     }
+    static QString lastLine = "";
 
-    QStringList list = output.split("\n");
+    if (lastLine.size()){
+        inputData = lastLine + inputData;
+        lastLine = "";
+    }
 
-    while (list.length() > 0) {
-        output = list.takeFirst();
-
-        if (strlen(output.toStdString().c_str()) == 0) {
+    QStringList list = inputData.split("\n");
+    QRegularExpression re("^\\d{2}-\\d{2}");
+    while (list.length() > 1) {
+        inputData = list.takeFirst();
+        if (inputData.size() == 0) {
             continue;
         }
 
-        sscanf(output.toStdString().c_str(), "%s %s %s %s %s %s %9999[^\n]", g_date, g_time, g_pid, g_tid, g_logLevel, g_tag, g_content);
+        QRegularExpressionMatch match = re.match(inputData);
+        if (match.hasMatch()) {
+            sscanf(inputData.toStdString().c_str(), "%s %s %s %s %s %s %9999[^\n]", g_date, g_time, g_pid, g_tid, g_logLevel, g_tag, g_content);
+        } else {
+            qDebug() << "log format error:" + inputData;
+            continue;
+        }
 
         DltLogLevelType level = DLT_LOG_INFO;
         if (!strncmp(g_logLevel, "F", 1)){
@@ -3395,28 +3590,32 @@ void MainWindow::readAdbData(EcuItem *ecuitem)
 
         data.append(QByteArray(g_dlt_msg, index));
     }
+
+    if (list.size()) {
+        lastLine = list.takeFirst();
+    }
 }
 
 void MainWindow::adbDisconnected(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    for(int num = 0; num < project.ecu->topLevelItemCount (); num++)
-    {
-        EcuItem *ecuitem = (EcuItem*)project.ecu->topLevelItem(num);
-        if (ecuitem->interfacetype == EcuItem::INTERFACETYPE_ADB) {
-            qDebug() << "adbDisconnected, Restart Ecu device:" + QString::number(num);
-            QObject::disconnect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
-            ecuitem->process.close();
-            ecuitem->process.reset();
+    // for(int num = 0; num < project.ecu->topLevelItemCount (); num++)
+    // {
+    //     EcuItem *ecuitem = (EcuItem*)project.ecu->topLevelItem(num);
+    //     if (ecuitem->interfacetype == EcuItem::INTERFACETYPE_ADB) {
+    //         qDebug() << "adbDisconnected, Restart Ecu device:" + QString::number(num);
+    //         QObject::disconnect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
+    //         ecuitem->process.close();
+    //         ecuitem->process.reset();
 
-            ecuitem->process.setProcessChannelMode(QProcess::MergedChannels);
-            if (ecuitem->adbId == "default" || ecuitem->adbId == "") {
-                ecuitem->process.start("adb.exe", {"logcat"});
-            } else {
-                ecuitem->process.start("adb.exe", {"-s", ecuitem->adbId, "logcat"});
-            }
-            QObject::connect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
-        }
-    }
+    //         ecuitem->process.setProcessChannelMode(QProcess::MergedChannels);
+    //         if (ecuitem->adbId == "default" || ecuitem->adbId == "") {
+    //             ecuitem->process.start("adb.exe", {"logcat"});
+    //         } else {
+    //             ecuitem->process.start("adb.exe", {"-s", ecuitem->adbId, "logcat"});
+    //         }
+    //         QObject::connect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
+    //     }
+    // }
 }
 
 void MainWindow::connectECU(EcuItem* ecuitem,bool force)
@@ -4166,6 +4365,7 @@ void MainWindow::updateIndex()
     /* update indexes  and table view */
     int oldsize = qfile.size();
     qfile.updateIndex();
+    qfileFullLog.updateIndex();
 
     bool silentMode = !QDltOptManager::getInstance()->issilentMode();
 
@@ -4242,6 +4442,7 @@ void MainWindow::drawUpdatedView()
     statusSyncFoundReceived->setText(QString("Sync found: %L1").arg(totalSyncFoundRcvd));
 
     tableModel->modelChanged();
+    m_fullLogTableModel->modelChanged();
 
     //Line below would resize the payload column automatically so that the whole content is readable
     //ui->tableView->resizeColumnToContents(11); //Column 11 is the payload column
@@ -6839,6 +7040,7 @@ void MainWindow::filterDialogRead(FilterDialog &dlg,FilterItem* item)
     if(item->filter.isMarker())
     {
         tableModel->modelChanged();
+        m_fullLogTableModel->modelChanged();
     }
 }
 
@@ -7310,6 +7512,41 @@ void MainWindow::on_tableView_SearchIndex_customContextMenuRequested(QPoint pos)
     menu.exec(globalPos);
 }
 
+void MainWindow::on_tableView_fullLog_customContextMenuRequested(QPoint pos)
+{
+    /* show custom pop menu  for search table */
+    QPoint globalPos = ui->tableView_fullLog->mapToGlobal(pos);
+    QMenu menu(ui->tableView_fullLog);
+    QAction *action;
+
+    action = new QAction("&Copy Selection to Clipboard", this);
+    connect(action, &QAction::triggered, this, &MainWindow::onActionMenuConfigFullTableCopyToClipboardTriggered);
+    menu.addAction(action);
+
+    action = new QAction("C&opy Selection Payload to Clipboard", this);
+    connect(action, &QAction::triggered, this, &MainWindow::onActionMenuConfigFullTableCopyPayloadToClipboardTriggered);
+    menu.addAction(action);
+
+    menu.addSeparator();
+    action = new QAction("Copy Selection for &Jira to Clipboard", this);
+    connect(action, &QAction::triggered, this, &MainWindow::onActionMenuConfigFullTableCopyJiraToClipboardTriggered);
+    menu.addAction(action);
+
+    action = new QAction("Copy Selection for J&ira (+Head) to Clipboard", this);
+    connect(action, &QAction::triggered, this, &MainWindow::onActionMenuConfigFullTableCopyJiraHeadToClipboardTriggered);
+    menu.addAction(action);
+
+    menu.addSeparator();
+    action = new QAction("Resize columns to fit", this);
+    connect(action, SIGNAL(triggered()), ui->tableView_fullLog, SLOT(resizeColumnsToContents()));
+    menu.addAction(action);
+
+    menu.addSeparator();
+
+    /* show popup menu */
+    menu.exec(globalPos);
+}
+
 void MainWindow::onActionMenuConfigSearchTableCopyToClipboardTriggered()
 {
     exportSelection_searchTable(DltExporter::FormatClipboard);
@@ -7330,20 +7567,40 @@ void MainWindow::onActionMenuConfigSearchTableCopyJiraHeadToClipboardTriggered()
     exportSelection_searchTable(DltExporter::FormatClipboardJiraTableHead);
 }
 
+void MainWindow::onActionMenuConfigFullTableCopyToClipboardTriggered()
+{
+    exportSelectionFullLog(DltExporter::FormatClipboard);
+}
+
+void MainWindow::onActionMenuConfigFullTableCopyPayloadToClipboardTriggered()
+{
+    exportSelectionFullLog(DltExporter::FormatClipboardPayloadOnly);
+}
+
+void MainWindow::onActionMenuConfigFullTableCopyJiraToClipboardTriggered()
+{
+    exportSelectionFullLog(DltExporter::FormatClipboardJiraTable);
+}
+
+void MainWindow::onActionMenuConfigFullTableCopyJiraHeadToClipboardTriggered()
+{
+    exportSelectionFullLog(DltExporter::FormatClipboardJiraTableHead);
+}
+
 void MainWindow::keyPressEvent ( QKeyEvent * event )
 {
-    if(event->matches(QKeySequence::Copy))
-    {
-        if(ui->tableView->hasFocus())
-        {
-            exportSelection(true,false);
-        }
+    // if(event->matches(QKeySequence::Copy))
+    // {
+    //     if(ui->tableView->hasFocus())
+    //     {
+    //         exportSelection(true,false);
+    //     }
 
-        if(ui->tableView_SearchIndex->hasFocus())
-        {
-            exportSelection_searchTable();
-        }
-    }
+    //     if(ui->tableView_SearchIndex->hasFocus())
+    //     {
+    //         exportSelection_searchTable();
+    //     }
+    // }
     if(event->matches(QKeySequence::Paste))
     {
         QMessageBox::warning(this, QString("Paste"),
@@ -7995,6 +8252,7 @@ void MainWindow::filterOrderChanged()
 {
     filterUpdate();
     tableModel->modelChanged();
+    m_fullLogTableModel->modelChanged();
 }
 
 void MainWindow::filterCountChanged()
@@ -8003,6 +8261,7 @@ void MainWindow::filterCountChanged()
     filterUpdate();
     // update the currently shown table
     tableModel->modelChanged();
+    m_fullLogTableModel->modelChanged();
     // enable the "Apply" button
     applyConfigEnabled(true);
     // update the menu entries based on current selection
@@ -8034,6 +8293,31 @@ void MainWindow::searchtable_cellSelected( QModelIndex index)
     jump_to_line(entry);
 
 }
+
+void MainWindow::filterResult_cellSelected( QModelIndex index)
+{
+    unsigned long entry = 0;
+    QString entryString = QString("%L1").arg(tableModel->qfile->getMsgFilterPos(index.row()));
+
+    entryString.remove(',');
+
+    bool ok;
+    entry = entryString.toLong(&ok);
+
+    if (!ok || (m_fullLogTableModel->rowCount() < entry) )
+        return;
+
+    m_fullLogTableModel->setLastSearchIndex(entry);
+
+
+    ui->tableView_fullLog->selectionModel()->clear();
+
+    QModelIndex idx = m_fullLogTableModel->index(entry, 0, QModelIndex());
+    ui->tableView_fullLog->scrollTo(idx, QAbstractItemView::PositionAtTop);
+    ui->tableView_fullLog->selectionModel()->select(idx, QItemSelectionModel::Select|QItemSelectionModel::Rows);
+    ui->tableView_fullLog->setFocus();
+}
+
 
 void MainWindow::on_comboBoxFilterSelection_activated(const QString &arg1)
 {

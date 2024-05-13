@@ -63,6 +63,10 @@ SearchDialog::SearchDialog(QWidget *parent) :
     fSilentMode = !QDltOptManager::getInstance()->issilentMode();
 
     updateColorbutton();
+    ui->label_8->setVisible(false);
+    ui->timeStartlineEdit->setVisible(false);
+    ui->label_9->setVisible(false);
+    ui->timeEndlineEdit->setVisible(false);
 }
 
 SearchDialog::~SearchDialog()

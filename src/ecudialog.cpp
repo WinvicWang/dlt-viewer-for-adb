@@ -79,6 +79,20 @@ EcuDialog::EcuDialog(QWidget *parent) :
 
     ui->comboBoxBaudrate->setCurrentIndex(ui->comboBoxBaudrate->count()-1);
 
+    ui->tabWidget->setTabVisible(2, false);
+    ui->tabWidget->setTabVisible(3, false);
+    ui->tabWidget->setTabVisible(4, false);
+    ui->label_5->setVisible(false);
+    ui->label_10->setVisible(false);
+    ui->tracestatusComboBox->setVisible(false);
+    ui->comboBoxVerboseMode->setVisible(false);
+    ui->checkBoxWriteDLTv2StorageHeader->setVisible(false);
+    ui->checkBoxGetLogInfo->setVisible(false);
+    ui->checkBoxGetSoftwareVersion->setVisible(false);
+    ui->checkBoxTiming->setVisible(false);
+    ui->checkBoxDefaultLogLevel->setVisible(false);
+    ui->checkBoxUpdate->setVisible(false);
+
 }
 
 EcuDialog::~EcuDialog()

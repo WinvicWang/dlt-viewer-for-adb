@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>545</width>
-    <height>709</height>
+    <height>752</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -405,11 +405,14 @@
          <layout class="QGridLayout" name="gridLayout_7">
           <item row="7" column="0">
            <widget class="QGroupBox" name="groupBoxAutomaticTimeSettings">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="title">
              <string>Set time column automatic to local recording time</string>
             </property>
             <property name="checkable">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <layout class="QGridLayout" name="gridLayout_9">
              <item row="1" column="0">
@@ -543,6 +546,9 @@
           </item>
           <item row="2" column="0">
            <widget class="QGroupBox" name="groupBoxArguments">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -554,6 +560,9 @@
             </property>
             <property name="checkable">
              <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
             </property>
             <layout class="QGridLayout" name="gridLayout_11">
              <property name="topMargin">
@@ -597,8 +606,40 @@
           </item>
           <item row="1" column="0">
            <layout class="QGridLayout" name="gridLayout_3">
+            <item row="2" column="2">
+             <widget class="QSpinBox" name="spinBoxSectionSize">
+              <property name="toolTip">
+               <string>Range between 1 and 40</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>40</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>16</number>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QCheckBox" name="checkBoxTime">
+              <property name="text">
+               <string>Show Time</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
             <item row="6" column="2">
              <widget class="QCheckBox" name="checkBoxMode">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Show Mode</string>
               </property>
@@ -620,94 +661,11 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="2">
-             <widget class="QLabel" name="labelFont">
-              <property name="text">
-               <string>Font</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QCheckBox" name="checkBoxTag">
-              <property name="text">
-               <string>Show Tag</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="1">
-             <widget class="QCheckBox" name="checkBoxTimestamp">
-              <property name="text">
-               <string>Show Timestamp</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="labelShowColumn">
-              <property name="text">
-               <string>Select the columns to show in the viewer:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Table font (default Segoe UI,8):</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QCheckBox" name="checkBoxTime">
-              <property name="text">
-               <string>Show Time</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QSpinBox" name="spinBoxSectionSize">
-              <property name="toolTip">
-               <string>Range between 1 and 40</string>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>40</number>
-              </property>
-              <property name="singleStep">
-               <number>1</number>
-              </property>
-              <property name="value">
-               <number>16</number>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="1">
-             <widget class="QCheckBox" name="checkBoxType">
-              <property name="text">
-               <string>Show Type</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
             <item row="8" column="0">
              <widget class="QCheckBox" name="checkBoxNoar">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Show #Arguments</string>
               </property>
@@ -719,17 +677,33 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="1">
-             <widget class="QPushButton" name="pushButtonSelectFont">
+            <item row="3" column="2">
+             <widget class="QLabel" name="labelFont">
               <property name="text">
-               <string>Select</string>
+               <string>Font</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="labelSpacer">
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>Table section height (default 16):</string>
+               <string>Table font (default Segoe UI,8):</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QCheckBox" name="checkBoxType">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Show Type</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -743,8 +717,28 @@
               </property>
              </widget>
             </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="labelShowColumn">
+              <property name="text">
+               <string>Select the columns to show in the viewer:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QCheckBox" name="checkBoxTag">
+              <property name="text">
+               <string>Show Tag</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
             <item row="7" column="0">
              <widget class="QCheckBox" name="checkBoxCount">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Show Count</string>
               </property>
@@ -753,7 +747,37 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="2">
+            <item row="2" column="0">
+             <widget class="QLabel" name="labelSpacer">
+              <property name="text">
+               <string>Table section height (default 16):</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QPushButton" name="pushButtonSelectFont">
+              <property name="text">
+               <string>Select</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QCheckBox" name="checkBoxTimestamp">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Show Timestamp</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
              <widget class="QCheckBox" name="checkBoxPayload">
               <property name="text">
                <string>Show Payload</string>
@@ -767,6 +791,9 @@
           </item>
           <item row="6" column="0">
            <widget class="QGroupBox" name="groupBoxMessageId">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
               <horstretch>0</horstretch>
@@ -783,7 +810,7 @@
              <string>Show Message Id (Non-Verbose)</string>
             </property>
             <property name="checkable">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <widget class="QComboBox" name="comboBox_MessageIdFormat">
              <property name="geometry">
@@ -1109,11 +1136,9 @@
   <tabstop>checkBoxTag</tabstop>
   <tabstop>checkBoxSubtype</tabstop>
   <tabstop>checkBoxTime</tabstop>
-  <tabstop>checkBoxTimestamp</tabstop>
   <tabstop>checkBoxMode</tabstop>
   <tabstop>checkBoxCount</tabstop>
   <tabstop>checkBoxType</tabstop>
-  <tabstop>checkBoxPayload</tabstop>
   <tabstop>checkBoxNoar</tabstop>
   <tabstop>groupBoxProcId</tabstop>
   <tabstop>radioButtonProcId</tabstop>

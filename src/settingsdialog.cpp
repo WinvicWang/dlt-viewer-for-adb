@@ -120,6 +120,16 @@ SettingsDialog::SettingsDialog(QDltFile *_qFile, QWidget *parent):
     QDltSettingsManager *settings = QDltSettingsManager::getInstance();
     settings->fmaxFileSizeMB = 0.0;
     settings->appendDateTime = 0;
+
+    ui->groupBoxMessageId->setVisible(false);
+    ui->groupBoxAutomaticTimeSettings->setVisible(false);
+    ui->groupBoxArguments->setVisible(false);
+    ui->checkBoxMode->setVisible(false);
+    ui->checkBoxCount->setVisible(false);
+    ui->checkBoxType->setVisible(false);
+    ui->checkBoxNoar->setVisible(false);
+    ui->checkBoxTimestamp->setVisible(false);
+    ui->groupBoxSessionId->setVisible(false);
 }
 
 SettingsDialog::SettingsDialog(QWidget *parent) :

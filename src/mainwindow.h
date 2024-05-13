@@ -130,6 +130,7 @@ private:
     bool outputfileIsFromCLI;
     TableModel *tableModel;
     SearchTableModel *m_searchtableModel;
+    TableModel *m_fullLogTableModel;
     WorkingDirectory workingDirectory;
 
     /* Status line items */
@@ -172,6 +173,7 @@ private:
     QList<QAction *> m_searchActions;
 
     QTableView *m_searchresultsTable;
+    QTableView *m_fullLogTable;
 
     /* Autoload plugins configuration */
     QStringList autoloadPluginsVersionEcus;
@@ -243,6 +245,7 @@ private:
     void initSignalConnections();
     void initFileHandling();
     void initSearchTable();
+    void initFullLogTable();
 
     /* general functions */
 
@@ -259,6 +262,7 @@ private:
     void reloadLogFileDefaultFilter();
 
     void exportSelection(bool ascii,bool file,DltExporter::DltExportFormat format);
+    void exportSelectionFullLog(DltExporter::DltExportFormat format);
     void exportSelection_searchTable(DltExporter::DltExportFormat format);
 
     void ControlServiceRequest(EcuItem* ecuitem, int service_id );
@@ -326,6 +330,7 @@ private:
     bool anyFiltersEnabled();
 
     bool openDltFile(QStringList fileName);
+    bool openADBLog(QString fileName);
     bool openDlpFile(QString filename);
     bool openDlfFile(QString filename, bool replace);
 
@@ -403,6 +408,7 @@ private slots:
 
     void on_tableView_customContextMenuRequested(QPoint pos);
     void on_tableView_SearchIndex_customContextMenuRequested(QPoint pos);
+    void on_tableView_fullLog_customContextMenuRequested(QPoint pos);
     void on_pluginWidget_customContextMenuRequested(QPoint pos);
     void on_filterWidget_customContextMenuRequested(QPoint pos);
     void on_configWidget_customContextMenuRequested(QPoint pos);
@@ -459,6 +465,9 @@ private slots:
     void searchTableRenewed();
     void searchtable_cellSelected(QModelIndex index);
 
+    // filter window
+    void filterResult_cellSelected(QModelIndex index);
+
     // Project methods
     void on_action_menuProject_Save_triggered();
     void on_action_menuProject_Open_triggered();
@@ -492,6 +501,10 @@ private slots:
     void onActionMenuConfigSearchTableCopyPayloadToClipboardTriggered();
     void onActionMenuConfigSearchTableCopyJiraToClipboardTriggered();
     void onActionMenuConfigSearchTableCopyJiraHeadToClipboardTriggered();
+    void onActionMenuConfigFullTableCopyToClipboardTriggered();
+    void onActionMenuConfigFullTableCopyPayloadToClipboardTriggered();
+    void onActionMenuConfigFullTableCopyJiraToClipboardTriggered();
+    void onActionMenuConfigFullTableCopyJiraHeadToClipboardTriggered();
 
     void on_action_menuConfig_Save_All_ECUs_triggered();
 
@@ -618,6 +631,7 @@ public:
 
     /* DLT file handling */
     QDltFile qfile;
+    QDltFile qfileFullLog;
 
     /* Loading and handling all plugins */
     QDltPluginManager pluginManager;
