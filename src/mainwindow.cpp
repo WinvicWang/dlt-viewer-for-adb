@@ -3506,6 +3506,10 @@ void MainWindow::readAdbData(EcuItem *ecuitem)
             continue;
         }
 
+        g_date[0] = ' ';
+        g_time[0] = ' ';
+        g_date[1] = '\0';
+        g_time[1] = '\0';
         g_pid[0] = '\0';
         g_tid[0] = '\0';
         g_logLevel[0] = '\0';
@@ -3581,6 +3585,8 @@ void MainWindow::readAdbData(EcuItem *ecuitem)
         //Set pid and tid
         memcpy(&g_dlt_msg[index], g_pid, MIN(strlen(g_pid),DLT_ID_SIZE)); index += DLT_ID_SIZE;
         memcpy(&g_dlt_msg[index], g_tid, MIN(strlen(g_tid),DLT_ID_SIZE)); index += DLT_ID_SIZE;
+        memcpy(&g_dlt_msg[index], g_date, MIN(strlen(g_date),DLT_ID_SIZE)); index += DLT_ID_SIZE;
+        memcpy(&g_dlt_msg[index], g_time, MIN(strlen(g_time),DLT_ID_SIZE)); index += DLT_ID_SIZE;
         //Send ASCII String
         g_dlt_msg[index++] = 0x00;
         g_dlt_msg[index++] = 0x02;
@@ -4077,7 +4083,7 @@ void MainWindow::writeDLTMessageToFile(QByteArray &bufferHeader,char* bufferPayl
 
     /* get time of day */
     #if defined(_MSC_VER)
-       SYSTEMTIME systemtime;
+    SYSTEMTIME systemtime;
        GetSystemTime(&systemtime);
        time_t timestamp_sec;
        time(&timestamp_sec);
@@ -7680,6 +7686,10 @@ void MainWindow::dropEvent(QDropEvent *event)
             {
                 filenames.append(filename);
                 workingDirectory.setDltDirectory(QFileInfo(filename).absolutePath());
+            }
+            else if(filename.endsWith(".txt", Qt::CaseInsensitive))
+            {
+                openADBLog(filename);
             }
             else if(filename.endsWith(".dlp", Qt::CaseInsensitive))
             {

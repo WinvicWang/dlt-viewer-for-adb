@@ -54,7 +54,7 @@ void DltExporter::writeCSVLine(int index, QFile *to, QDltMsg msg)
     QString text("");
 
     text += escapeCSVValue(QString("%1").arg(index)).append(",");
-    text += escapeCSVValue(QString("%1.%2").arg(msg.getTimeString()).arg(msg.getMicroseconds(),6,10,QLatin1Char('0'))).append(",");
+    text += escapeCSVValue(QString("%1.%2").arg(msg.getAdbDate()).arg(msg.getAdbTime())).append(",");
     text += escapeCSVValue(QString("%1.%2").arg(msg.getTimestamp()/10000).arg(msg.getTimestamp()%10000,4,10,QLatin1Char('0'))).append(",");
     text += escapeCSVValue(QString("%1").arg(msg.getMessageCounter())).append(",");
     text += escapeCSVValue(QString("%1").arg(msg.getTag())).append(",");
@@ -305,7 +305,7 @@ bool DltExporter::exportMsg(unsigned long int num, QDltMsg &msg, QByteArray &buf
         else
             return false;
 
-        text += "|" + QString("%1.%2").arg(msg.getTimeString()).arg(msg.getMicroseconds(),4,10,QLatin1Char('0')) +
+        text += "|" + QString("%1.%2").arg(msg.getAdbDate()).arg(msg.getAdbTime()) +
                 "|" + QString("%1.%2").arg(msg.getTimestamp()/10000).arg(msg.getTimestamp()%10000,4,10,QLatin1Char('0')) +
                 "|" + msg.getTag() +
                 "|" + msg.getPid() +

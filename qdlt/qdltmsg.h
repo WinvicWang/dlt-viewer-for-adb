@@ -184,6 +184,9 @@ public:
     */
     QString getPid() const { return pid; }
 
+    QString getAdbDate() const { return adbDate; }
+    QString getAdbTime() const { return adbTime; }
+
     //! Set the process id of the DLT message.
     /*!
       \param id The process id.
@@ -550,6 +553,11 @@ public:
 protected:
 
 private:
+    //! The header parameter adb date.
+    QString adbDate;
+
+    //! The header parameter adb time.
+    QString adbTime;
 
     //! The header parameter Tag.
     QString tag;

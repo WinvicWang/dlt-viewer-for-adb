@@ -193,7 +193,7 @@ bool QDltFile::updateIndex()
             }
             else
             {
-                storageLength = 88;
+                storageLength = sizeof(DltStorageHeader);
             }
 
             // read and  get last message length
@@ -319,7 +319,7 @@ bool QDltFile::updateIndex()
                         current_message_pos = pos+num-3;
                         counter_header = 3;
                         if(cbuf[num] == 0x01)
-                            storageLength = 88;
+                            storageLength = sizeof(DltStorageHeader);
                         else
                             storageLength = 13;
                         if(current_message_pos!=0)
@@ -341,7 +341,7 @@ bool QDltFile::updateIndex()
                         current_message_pos = pos+num-3;
                         counter_header = 3;
                         if(cbuf[num] == 0x01)
-                            storageLength = 88;
+                            storageLength = sizeof(DltStorageHeader);
                         else
                             storageLength = 13;
                         // speed up move directly to message length, if inside current buffer

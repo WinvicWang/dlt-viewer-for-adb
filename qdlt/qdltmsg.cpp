@@ -472,6 +472,9 @@ bool QDltMsg::setMsg(const QByteArray& buf, bool withStorageHeader)
             tid = QDltMsg::getStringFromId(extendedheader->tid);
         }
 
+        adbDate = QDltMsg::getStringFromId(extendedheader->date);
+        adbTime = QDltMsg::getStringFromId(extendedheader->time);
+
         /* extract type */
         if (DLT_IS_HTYP_UEH(standardheader->htyp))
         {
@@ -1107,7 +1110,7 @@ QString QDltMsg::toStringHeader() const
     QString text;
     text.reserve(1024);
 
-    text += QString("%1.%2").arg(getTimeString()).arg(getMicroseconds(),6,10,QLatin1Char('0'));
+    text += QString("%1.%2").arg(getAdbDate()).arg(getAdbTime());
     // text += QString(" %1.%2").arg(getTimestamp()/10000).arg(getTimestamp()%10000,4,10,QLatin1Char('0'));
     // text += QString(" %1").arg(getMessageCounter());
     text += QString(" %1").arg(getPid());

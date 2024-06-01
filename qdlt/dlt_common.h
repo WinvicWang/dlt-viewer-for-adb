@@ -180,7 +180,7 @@
 /**
  * The size of a DLT ID
  */
-#define DLT_ID_SIZE 40
+#define DLT_ID_SIZE 50
 
 #define DLT_SIZE_WEID DLT_ID_SIZE
 #define DLT_SIZE_WSID (sizeof(uint32_t))
@@ -362,6 +362,8 @@ typedef struct
     uint8_t noar;          /**< number of arguments */
     char pid[DLT_ID_SIZE];          /**< process id */
     char tid[DLT_ID_SIZE];          /**< thread id */
+    char date[DLT_ID_SIZE];          /**< adb date */
+    char time[DLT_ID_SIZE];          /**< adb time */
 } PACKED DltExtendedHeader;
 
 /**

@@ -384,7 +384,7 @@ void FiletransferPlugin::doFLER(QDltMsg *msg)
     QDltArgument errorCode2;
     msg->getArgument(PROTOCOL_FLER_ERRCODE2,errorCode2);
 
-    emit(form->handle_errorsignal(filename.toString(),errorCode1.toString(),errorCode2.toString(),msg->getTimeString()));
+    emit(form->handle_errorsignal(filename.toString(),errorCode1.toString(),errorCode2.toString(),msg->getAdbDate()));
 }
 
 bool FiletransferPlugin::command(QString command, QList<QString> params)

@@ -152,10 +152,7 @@ TableModel::TableModel(const QString & /*data*/, QObject *parent)
              /* display index */
              return QString("%L1").arg(qfile->getMsgFilterPos(index.row()));
          case FieldNames::Time:
-             if( project->settings->automaticTimeSettings == 0 )
-                return QString("%1.%2").arg(msg.getGmTimeWithOffsetString(project->settings->utcOffset,project->settings->dst)).arg(msg.getMicroseconds(),6,10,QLatin1Char('0'));
-             else
-                return QString("%1.%2").arg(msg.getTimeString()).arg(msg.getMicroseconds(),6,10,QLatin1Char('0'));
+            return msg.getAdbDate() + " " + msg.getAdbTime();
          case FieldNames::TimeStamp:
              return QString("%1.%2").arg(msg.getTimestamp()/10000).arg(msg.getTimestamp()%10000,4,10,QLatin1Char('0'));
          case FieldNames::Counter:
