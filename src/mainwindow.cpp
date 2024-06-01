@@ -986,7 +986,7 @@ void MainWindow::deleteactualFile()
                                   .arg(outputfile.fileName())
                                   .arg(outputfile.errorString()));
          }
-	   }
+       }
     }
 }
 
@@ -2140,7 +2140,7 @@ void MainWindow::reloadLogFile(bool update, bool multithreaded)
 
     if ( true == isDltFileReadOnly )
     {
-	name += " (ReadOnly)";
+    name += " (ReadOnly)";
     }
 
     statusFilename->setMinimumWidth(1); // this is the rollback of the workaround for first call
@@ -3506,12 +3506,22 @@ void MainWindow::readAdbData(EcuItem *ecuitem)
             continue;
         }
 
+        g_pid[0] = '\0';
+        g_tid[0] = '\0';
+        g_logLevel[0] = '\0';
+        g_tag[0] = ' ';
+        g_tag[1] = '\0';
+        g_content[0] = '\0';
+
         QRegularExpressionMatch match = re.match(inputData);
         if (match.hasMatch()) {
             sscanf(inputData.toStdString().c_str(), "%s %s %s %s %s %s %9999[^\n]", g_date, g_time, g_pid, g_tid, g_logLevel, g_tag, g_content);
         } else {
             qDebug() << "log format error:" + inputData;
-            continue;
+            g_logLevel[0] = 'E';
+            int copy_size = inputData.size() < sizeof(g_content) ? inputData.size() : sizeof(g_content);
+            memcpy(g_content, inputData.toStdString().c_str(), copy_size);
+            g_content[copy_size] = '\0';
         }
 
         DltLogLevelType level = DLT_LOG_INFO;
@@ -3598,24 +3608,24 @@ void MainWindow::readAdbData(EcuItem *ecuitem)
 
 void MainWindow::adbDisconnected(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    // for(int num = 0; num < project.ecu->topLevelItemCount (); num++)
-    // {
-    //     EcuItem *ecuitem = (EcuItem*)project.ecu->topLevelItem(num);
-    //     if (ecuitem->interfacetype == EcuItem::INTERFACETYPE_ADB) {
-    //         qDebug() << "adbDisconnected, Restart Ecu device:" + QString::number(num);
-    //         QObject::disconnect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
-    //         ecuitem->process.close();
-    //         ecuitem->process.reset();
+    for(int num = 0; num < project.ecu->topLevelItemCount (); num++)
+    {
+        EcuItem *ecuitem = (EcuItem*)project.ecu->topLevelItem(num);
+        if (ecuitem->interfacetype == EcuItem::INTERFACETYPE_ADB) {
+            qDebug() << "adbDisconnected, Restart Ecu device:" + QString::number(num);
+            QObject::disconnect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
+            ecuitem->process.close();
+            ecuitem->process.reset();
 
-    //         ecuitem->process.setProcessChannelMode(QProcess::MergedChannels);
-    //         if (ecuitem->adbId == "default" || ecuitem->adbId == "") {
-    //             ecuitem->process.start("adb.exe", {"logcat"});
-    //         } else {
-    //             ecuitem->process.start("adb.exe", {"-s", ecuitem->adbId, "logcat"});
-    //         }
-    //         QObject::connect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
-    //     }
-    // }
+            ecuitem->process.setProcessChannelMode(QProcess::MergedChannels);
+            if (ecuitem->adbId == "default" || ecuitem->adbId == "") {
+                ecuitem->process.start("adb.exe", {"logcat"});
+            } else {
+                ecuitem->process.start("adb.exe", {"-s", ecuitem->adbId, "logcat"});
+            }
+            QObject::connect(&ecuitem->process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(adbDisconnected(int,QProcess::ExitStatus)));
+        }
+    }
 }
 
 void MainWindow::connectECU(EcuItem* ecuitem,bool force)
