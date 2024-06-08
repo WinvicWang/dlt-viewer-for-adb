@@ -894,7 +894,7 @@
           <item row="8" column="0">
            <widget class="QCheckBox" name="checkBoxAppendDateTime">
             <property name="text">
-             <string>Append Date/Time to filename when closing DLT Viewer</string>
+             <string>Append Date/Time to filename when closing DLT Viewer For Adb</string>
             </property>
            </widget>
           </item>

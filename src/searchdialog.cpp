@@ -421,7 +421,7 @@ void SearchDialog::findMessages(long int searchLine, long int searchBorder, QReg
     m_searchtablemodel->clear_SearchResults();
 
     QProgressDialog fileprogress("Searching...", "Abort", 0, file->sizeFilter(), this);
-    fileprogress.setWindowTitle("DLT Viewer");
+    fileprogress.setWindowTitle("DLT Viewer For Adb");
     fileprogress.setWindowModality(Qt::NonModal);
     fileprogress.show();
 

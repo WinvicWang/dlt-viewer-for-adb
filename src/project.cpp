@@ -1036,7 +1036,7 @@ bool Project::Save(QString filename)
     QFile file(filename);
     if (!file.open(QFile::WriteOnly | QFile::Truncate | QFile::Text))
     {
-             QMessageBox::critical(0, QString("DLT Viewer"),
+             QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                                   QString("Cannot read project file %1:\n%2.")
                                   .arg(filename)
                                   .arg(file.errorString()));
@@ -1170,7 +1170,7 @@ bool Project::LoadFilter(QString filename, bool replace){
     {
         if ( QDltOptManager::getInstance()->issilentMode() == false )
         {
-            QMessageBox::critical(0, QString("DLT Viewer"),QString("Loading DLT Filter file failed!"));
+            QMessageBox::critical(0, QString("DLT Viewer For Adb"),QString("Loading DLT Filter file failed!"));
         }
         else
         {

@@ -66,7 +66,7 @@ desktop.files = resources/org.genivi.DLTViewer.desktop
 INSTALLS += desktop
 
 # Unix header exports
-headers.path = $$PREFIX/usr/include/dlt-viewer
+headers.path = $$PREFIX/usr/include/dlt-viewer-for-adb
 headers.files = plugininterface.h
 INSTALLS += headers
 
@@ -113,7 +113,7 @@ RCC_DIR     = build/rcc
 UI_DIR      = build/ui
 
 # Executable name
-TARGET = dlt-viewer
+TARGET = dlt-viewer-for-adb
 
 # This is an application
 TEMPLATE = app

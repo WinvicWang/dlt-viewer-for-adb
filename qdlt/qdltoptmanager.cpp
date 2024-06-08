@@ -65,19 +65,19 @@ void QDltOptManager::printVersion(QString appname)
 void QDltOptManager::printUsage()
 {
 #if (WIN32)
-    qDebug()<<"Usage: dlt-viewer.exe [OPTIONS]";
+    qDebug()<<"Usage: dlt-viewer-for-adb.exe [OPTIONS]";
 #else
-    qDebug()<<"Usage: dlt-viewer [OPTIONS]";
+    qDebug()<<"Usage: dlt-viewer-for-adb [OPTIONS]";
 #endif
 
     qDebug()<<"Options:";
     qDebug()<<" -h Print usage";
     qDebug()<<" -p projectfile \t Loading project file on startup (must end with .dlp)";
-    qDebug()<<" -l logfile     \t Loading logfile on startup (must end with .dlt)";
+    qDebug()<<" -l logfile     \t Loading logfile on startup (must end with .dlta)";
     qDebug()<<" -f filterfile  \t Loading filterfile on startup (must end with .dlf)";
     qDebug()<<" -s or --silent  \t Enable silent mode without warning message boxes.";
     qDebug()<<" -v or --version \t Only show version and buildtime information";
-    qDebug()<<" -c logfile textfile \t Convert logfile file to textfile (logfile must end with .dlt)";
+    qDebug()<<" -c logfile textfile \t Convert logfile file to textfile (logfile must end with .dlta)";
     qDebug()<<" -u Conversion will be done in UTF8 instead of ASCII";
     qDebug()<<" -csv Conversion will be done in CSV format";
     qDebug()<<" -d Conversion will NOT be done, save in dlt file format again instead";
@@ -85,21 +85,21 @@ void QDltOptManager::printUsage()
     qDebug()<<" -e \"plugin|command|param1|..|param<n>\" \tExecute a plugin command with <n> parameters.\n";
     qDebug()<<"Examples:";
     #if (WIN32)
-    qDebug()<<"  dlt-viewer.exe -c c:\\trace\\trace.dlt .\\trace.txt";
-    qDebug()<<"  dlt-viewer.exe -s -c -u c:\\trace\\trace.dlt .\\trace.txt";
-    qDebug()<<"  dlt-viewer.exe -s -d -c c:\\trace\\trace.dlt .\\trace.dlt";
-    qDebug()<<"  dlt-viewer.exe -s -p \\proj\\decodeded.dlp -dd -c c:\\trace\\trace.dlt .\\trace.dlt";
-    qDebug()<<"  dlt-viewer.exe -s -csv -c c:\\trace\\trace.dlt .\\trace.csv";
-    qDebug()<<"  dlt-viewer.exe -s -d -f c:\\filter\\filter.dlf -c c:\\trace\\trace.dlt .\\filteredtrace.dlt";
-    qDebug()<<"  dlt-viewer.exe -p c:\\proj\\export.dlp -l c:\\trace\\trace.dlt -e \"Filetransfer Plugin|export|ftransferdir\"";
+    qDebug()<<"  dlt-viewer-for-adb.exe -c c:\\trace\\trace.dlt .\\trace.txt";
+    qDebug()<<"  dlt-viewer-for-adb.exe -s -c -u c:\\trace\\trace.dlt .\\trace.txt";
+    qDebug()<<"  dlt-viewer-for-adb.exe -s -d -c c:\\trace\\trace.dlt .\\trace.dlt";
+    qDebug()<<"  dlt-viewer-for-adb.exe -s -p \\proj\\decodeded.dlp -dd -c c:\\trace\\trace.dlt .\\trace.dlt";
+    qDebug()<<"  dlt-viewer-for-adb.exe -s -csv -c c:\\trace\\trace.dlt .\\trace.csv";
+    qDebug()<<"  dlt-viewer-for-adb.exe -s -d -f c:\\filter\\filter.dlf -c c:\\trace\\trace.dlt .\\filteredtrace.dlt";
+    qDebug()<<"  dlt-viewer-for-adb.exe -p c:\\proj\\export.dlp -l c:\\trace\\trace.dlt -e \"Filetransfer Plugin|export|ftransferdir\"";
     #else
-    qDebug()<<"  dlt-viewer -c ./traces/trace.dlt ./trace.txt";
-    qDebug()<<"  dlt-viewer -s -c -u ./trace/trace.dlt ./trace.txt";
-    qDebug()<<"  dlt-viewer -s -d -c ./trace/trace.dlt ./trace.dlt";
-    qDebug()<<"  dlt-viewer -s -p ./proj/decodeded.dlp -dd -c ./trace/trace.dlt ./trace.dlt";
-    qDebug()<<"  dlt-viewer -s -csv -c ./trace/trace.dlt ./trace.csv";
-    qDebug()<<"  dlt-viewer -s -d -f ./filter/filter.dlf -c ./trace/trace.dlt ./filteredtrace.dlt";
-    qDebug()<<"  dlt-viewer -p ./proj/export.dlp -l ./trace/trace.dlt -e \"Filetransfer Plugin|export|./ftransferdir\"";
+    qDebug()<<"  dlt-viewer-for-adb -c ./traces/trace.dlt ./trace.txt";
+    qDebug()<<"  dlt-viewer-for-adb -s -c -u ./trace/trace.dlt ./trace.txt";
+    qDebug()<<"  dlt-viewer-for-adb -s -d -c ./trace/trace.dlt ./trace.dlt";
+    qDebug()<<"  dlt-viewer-for-adb -s -p ./proj/decodeded.dlp -dd -c ./trace/trace.dlt ./trace.dlt";
+    qDebug()<<"  dlt-viewer-for-adb -s -csv -c ./trace/trace.dlt ./trace.csv";
+    qDebug()<<"  dlt-viewer-for-adb -s -d -f ./filter/filter.dlf -c ./trace/trace.dlt ./filteredtrace.dlt";
+    qDebug()<<"  dlt-viewer-for-adb -p ./proj/export.dlp -l ./trace/trace.dlt -e \"Filetransfer Plugin|export|./ftransferdir\"";
     #endif
 }
 
@@ -132,7 +132,7 @@ void QDltOptManager::parse(QStringList *opt)
                qDebug()<< "Loading projectfile " << projectFile;
                return;
            }
-           if(opt->at(1).endsWith(".dlt") || opt->at(1).endsWith(".DLT"))
+           if(opt->at(1).endsWith(".dlta") || opt->at(1).endsWith(".DLTA"))
            {
                logFile = QString("%1").arg(opt->at(1));
                log = true;
@@ -199,7 +199,7 @@ void QDltOptManager::parse(QStringList *opt)
 
             QString l1 = opt->value(i+1);
 
-            if(l1!=nullptr && (l1.endsWith(".dlt")||l1.endsWith(".DLT")))
+            if(l1!=nullptr && (l1.endsWith(".dlta")||l1.endsWith(".DLTA")))
              {
                 logFile = QString("%1").arg(l1);
                 QFile Fout(logFile);
@@ -216,7 +216,7 @@ void QDltOptManager::parse(QStringList *opt)
             else
              {
                 qDebug()<<"\nError occured during processing of command line option \"-l\"";
-                qDebug()<<"e.g. file extension has to be \".dlt\"\n";
+                qDebug()<<"e.g. file extension has to be \".dlta\"\n";
                 printUsage();
                 exit(-1);
              }
@@ -257,7 +257,7 @@ void QDltOptManager::parse(QStringList *opt)
             QString c1 = opt->value(i+1);
             QString c2 = opt->value(i+2);
 
-            if(c1!=nullptr && (c1.endsWith(".dlt")||c1.endsWith(".DLT")) && c2!=nullptr)
+            if(c1!=nullptr && (c1.endsWith(".dlta")||c1.endsWith(".DLTA")) && c2!=nullptr)
              {
                 convertSourceFile = QString("%1").arg(c1);
                 convertDestFile = QString("%1").arg(c2);

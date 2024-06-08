@@ -47,7 +47,7 @@ QString DltLogstorageConfigCreatorPlugin::pluginInterfaceVersion() {
 }
 
 QString DltLogstorageConfigCreatorPlugin::description() {
-    return QString("DLT Viewer plugin to create and modify DLT Offline Logstorage configuration files");
+    return QString("DLT Viewer For Adb plugin to create and modify DLT Offline Logstorage configuration files");
 }
 
 QString DltLogstorageConfigCreatorPlugin::error() {

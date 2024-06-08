@@ -1,4 +1,4 @@
-# include global settings for all DLT Viewer Plugins
+# include global settings for all DLT Viewer For Adb Plugins
 include( ../plugin.pri )
 
 # Put intermediate files in the build directory

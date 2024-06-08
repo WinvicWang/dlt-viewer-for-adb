@@ -6,7 +6,7 @@ REM 25.11.20 1.1       Alexander Wenzel      Update to Qt 5.12.10
 REM 11.1.21  1.2       Alexander Wenzel      Update to Qt 5.12.12, Visual Studio 2017 Build Tools and simplify
 
 echo ************************************
-echo ***      DLT Viewer SDK          ***
+echo ***      DLT Viewer For Adb SDK          ***
 echo ************************************
 
 call build_config.bat
@@ -64,7 +64,7 @@ echo ************************************
 )
 
 echo ************************************
-echo ***       Build DLT Viewer       ***
+echo ***       Build DLT Viewer For Adb       ***
 echo ************************************
 
 mkdir build
@@ -166,7 +166,7 @@ if %ERRORLEVEL% NEQ 0 GOTO ERROR_HANDLER
 copy %QTDIR%\plugins\styles\qwindowsvistastyle.dll %DLT_VIEWER_SDK_DIR%\styles
 if %ERRORLEVEL% NEQ 0 GOTO ERROR_HANDLER
 
-copy %BUILD_DIR%\dlt-viewer.exe %DLT_VIEWER_SDK_DIR%
+copy %BUILD_DIR%\dlt-viewer-for-adb.exe %DLT_VIEWER_SDK_DIR%
 if %ERRORLEVEL% NEQ 0 GOTO ERROR_HANDLER
 
 copy %BUILD_DIR%\qdlt.dll %DLT_VIEWER_SDK_DIR%

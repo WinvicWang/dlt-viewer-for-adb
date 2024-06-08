@@ -31,10 +31,10 @@
 
 #define PLUGIN_INTERFACE_VERSION "1.0.1"
 
-//! Standard DLT Viewer Plugin Interface.
+//! Standard DLT Viewer For Adb Plugin Interface.
 /*!
-  This is the standard DLT Viewer Plugin Interface.
-  This interface must be inherited by each DLT Viewer plugin.
+  This is the standard DLT Viewer For Adb Plugin Interface.
+  This interface must be inherited by each DLT Viewer For Adb plugin.
 */
 
 class QDLTPluginInterface
@@ -120,7 +120,7 @@ public:
 Q_DECLARE_INTERFACE(QDLTPluginInterface,
                     "org.genivi.DLT.Plugin.DLTPluginInterface/1.0")
 
-//! Extended DLT Viewer Plugin Interface used by decoder plugins.
+//! Extended DLT Viewer For Adb Plugin Interface used by decoder plugins.
 /*!
   This is an extended DLT Plugin Interface.
   This interface must be used by decoder plugins.
@@ -156,7 +156,7 @@ public:
 Q_DECLARE_INTERFACE(QDLTPluginDecoderInterface,
                     "org.genivi.DLT.Plugin.DLTViewerPluginDecoderInterface/1.0")
 
-//! Extended DLT Viewer Plugin Interface used by viewer plugins.
+//! Extended DLT Viewer For Adb Plugin Interface used by viewer plugins.
 /*!
   This is an extended DLT Plugin Interface.
   This interface must be used by viewer plugins.
@@ -176,7 +176,7 @@ public:
     virtual QWidget* initViewer() = 0;
 
 
-    //! A new log file is opened by the DLT Viewer.
+    //! A new log file is opened by the DLT Viewer For Adb.
     /*! This function is called by the the viewer every time a new log file is opened by the viewer
       or a new log file is created and before all messages were processed with initMsg and initMsgDecoded.
       Errors should be reported by providing an error message.
@@ -185,7 +185,7 @@ public:
     */
     virtual void initFileStart(QDltFile *file) = 0;
 
-    //! A new undecoded DLT message is processed after a new log file is opened by the DLT Viewer
+    //! A new undecoded DLT message is processed after a new log file is opened by the DLT Viewer For Adb
     /*! After a new log file is opened this function is called by the viewer every time
         a new undecoded message is processed.
 
@@ -199,7 +199,7 @@ public:
     */
     virtual void initMsg(int index, QDltMsg &msg ) = 0;
 
-    //! A new decoded DLT message is processed after a new log file is opened by the DLT Viewer
+    //! A new decoded DLT message is processed after a new log file is opened by the DLT Viewer For Adb
     /*! After a new log file is opened this function is called by the viewer every time
         a new decoded message is processed.
 
@@ -213,7 +213,7 @@ public:
     */
     virtual void initMsgDecoded(int index, QDltMsg &msg ) = 0;
 
-    //! A new log file was opened by the DLT Viewer.
+    //! A new log file was opened by the DLT Viewer For Adb.
     /*! This function is called by the the viewer every time a new log file was opened by the viewer
       or a new log file is created and all messages were processed with initMsg and initMsgDecoded.
       Errors should be reported by providing an error message.

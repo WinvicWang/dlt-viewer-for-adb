@@ -66,7 +66,7 @@ public:
     DltViewer::Form *form;
 
 private:
-    QString plugin_name_displayed = QString("DLT Viewer Plugin");
+    QString plugin_name_displayed = QString("DLT Viewer For Adb Plugin");
     QString stringToHtml(QString str);
 
     QDltFile *dltFile;

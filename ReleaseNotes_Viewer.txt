@@ -1,4 +1,4 @@
-DLT Viewer For ADB - Release Notes
+DLT Viewer For Adb For ADB - Release Notes
 ===========================
 YiWang <winvic.wang@outlook.com>
 

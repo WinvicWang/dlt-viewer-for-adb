@@ -430,7 +430,7 @@ void SettingsDialog::readDlg()
         {
           settings->fmaxFileSizeMB = (float) 0.01;
           qDebug() <<  "Caution: minimum split file size limited to 0.01 Mb !";
-          //QMessageBox::warning(0, QString("DLT Viewer"), QString("Minimum value limited to 0.01 Mb !"));
+          //QMessageBox::warning(0, QString("DLT Viewer For Adb"), QString("Minimum value limited to 0.01 Mb !"));
         }
      }
 
@@ -549,7 +549,7 @@ QString SettingsDialog::getWorkingDirectory()
 void SettingsDialog::on_toolButtonDefaultLogFile_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open DLT Log file"), workingDirectory, tr("DLT Files (*.dlt);;All files (*.*)"));
+        tr("Open DLT Log file"), workingDirectory, tr("DLT Files (*.dlta);;All files (*.*)"));
 
     if(fileName.isEmpty())
         return;
@@ -588,8 +588,8 @@ void SettingsDialog::on_tooButtonPluginsPath_clicked()
 
     ui->lineEditPluginsPath->setText(fileName);
 
-    QMessageBox::warning(0, QString("DLT Viewer"),
-                         QString("Plugins will only be reloaded after restart of DLT Viewer!"));
+    QMessageBox::warning(0, QString("DLT Viewer For Adb"),
+                         QString("Plugins will only be reloaded after restart of DLT Viewer For Adb!"));
 
 }
 
@@ -607,7 +607,7 @@ void SettingsDialog::on_toolButtonDefaultFilterPath_clicked()
 
     ui->lineEditDefaultFilterPath->setText(fileName);
     emit(FilterPathChanged());
-    //QMessageBox::warning(0, QString("DLT Viewer"), QString("Default filters will be reloaded at next program start !"));
+    //QMessageBox::warning(0, QString("DLT Viewer For Adb"), QString("Default filters will be reloaded at next program start !"));
 }
 
 void SettingsDialog::on_toolButtonTempPath_clicked()

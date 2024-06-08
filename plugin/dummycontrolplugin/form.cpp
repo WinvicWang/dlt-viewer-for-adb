@@ -70,7 +70,7 @@ void Form::on_pushButtonClearFile_clicked()
 void Form::on_pushButtonNewFile_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-        tr("New DLT Log file"), tr(""), tr("DLT Files (*.dlt);;All files (*.*)"));
+        tr("New DLT Log file"), tr(""), tr("DLT Files (*.dlta);;All files (*.*)"));
 
     if(fileName.isEmpty())
     {
@@ -90,7 +90,7 @@ void Form::on_pushButtonQuit_clicked()
 void Form::on_pushButtonOpenFile_clicked()
 {
     QStringList fileNames = QFileDialog::getOpenFileNames(this,
-        tr("Open one or more DLT Log files"), tr(""), tr("DLT Files (*.dlt);;All files (*.*)"));
+        tr("Open one or more DLT Log files"), tr(""), tr("DLT Files (*.dlta);;All files (*.*)"));
 
     if(fileNames.isEmpty())
         return;
@@ -103,7 +103,7 @@ void Form::on_pushButtonSaveAsFile_clicked()
 {
     QFileDialog dialog(this);
     QStringList filters;
-    filters << "DLT Files (*.dlt)" <<"All files (*.*)";
+    filters << "DLT Files (*.dlta)" <<"All files (*.*)";
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("dlt");
     dialog.setNameFilters(filters);

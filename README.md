@@ -11,18 +11,18 @@ The Diagnostic Log Tool For Android ADB Device.
 
 ### Command line usage;
 
-+ Windows: `dlt-viewer.exe [OPTIONS]`
-+ Linux: `dlt-viewer [OPTIONS]`
++ Windows: `dlt-viewer-for-adb.exe [OPTIONS]`
++ Linux: `dlt-viewer-for-adb [OPTIONS]`
 + MacOS: `open -a $DLT_BUILD_DIR/bin/DLT\ Viewer.app --args [OPTIONS]`
 
 Options: 
 + `-h` Print usage
 + `-p projectfile` Loading project file on startup (must end with .dlp)
-+ `-l logfile`     Loading logfile on startup (must end with .dlt)
++ `-l logfile`     Loading logfile on startup (must end with .dlta)
 + `-f filterfile`  Loading filterfile on startup (must end with .dlf)
 + `-s or --silent`  Enable silent mode without warning message boxes
 + `-v or --version` Only show version and buildtime information
-+ `-c logfile textfile`  Convert logfile file to textfile (logfile must end with .dlt)
++ `-c logfile textfile`  Convert logfile file to textfile (logfile must end with .dlta)
 + `-u` Conversion will be done in UTF8 instead of ASCII";
 + `-csv` Conversion will be done in CSV format";
 + `-d` Conversion will NOT be done, save in dlt file format again instead"
@@ -49,9 +49,9 @@ License
 
 Full information on the license for this software is available in the "LICENSE.txt" file.
 
-## Source Code for DLT Viewer (This repository)
-https://github.com/WinvicWang/dlt-viewer-for-adb
-This repo is developed based on the repo https://github.com/COVESA/dlt-viewer, the license should follow Mozilla Public License, v. 2.0
+## Source Code for DLT Viewer For Adb (This repository)
+https://github.com/WinvicWang/dlt-viewer-for-adb-for-adb
+This repo is developed based on the repo https://github.com/COVESA/dlt-viewer-for-adb, the license should follow Mozilla Public License, v. 2.0
 
 
 

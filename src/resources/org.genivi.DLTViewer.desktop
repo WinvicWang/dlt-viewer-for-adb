@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=DLT Viewer
+Name=DLT Viewer For Adb
 GenericName=Diagnostic Log and Trace Viewer needed for devices running DLT daemon
-Exec=dlt-viewer %u
+Exec=dlt-viewer-for-adb %u
 Icon=org.genivi.DLTViewer
 Terminal=false
 Categories=Development;

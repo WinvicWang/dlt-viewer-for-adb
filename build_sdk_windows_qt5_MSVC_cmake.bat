@@ -7,7 +7,7 @@ REM 11.1.21  1.2       Alexander Wenzel      Update to Qt 5.12.12, Visual Studio
 REM 27.1.21  1.2       Alexander Wenzel      Update using cmake install
 
 echo ************************************
-echo ***      DLT Viewer SDK (cmake)  ***
+echo ***      DLT Viewer For Adb SDK (cmake)  ***
 echo ************************************
 
 call build_config.bat
@@ -73,7 +73,7 @@ echo ************************************
 )
 
 echo ************************************
-echo ***       Build DLT Viewer       ***
+echo ***       Build DLT Viewer For Adb       ***
 echo ************************************
 
 mkdir build

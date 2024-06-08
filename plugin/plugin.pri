@@ -1,4 +1,4 @@
-# Common project definitions for a DLT Viewer plugin
+# Common project definitions for a DLT Viewer For Adb plugin
 
 # Helpers to detect QT version
 QT_VERSION = $$[QT_VERSION]
@@ -97,5 +97,5 @@ CONFIG(debug, debug|release) {
 else {
     DESTDIR = ../../release/plugins
 }
-target.path = $$PREFIX/usr/share/dlt-viewer/plugins
+target.path = $$PREFIX/usr/share/dlt-viewer-for-adb/plugins
 INSTALLS += target

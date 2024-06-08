@@ -98,7 +98,7 @@ bool DltExporter::start()
              qDebug() << QString("ERROR - cannot open the export file %1").arg(to->fileName());
              }
             else
-            QMessageBox::critical(qobject_cast<QWidget *>(parent()), QString("DLT Viewer"),
+            QMessageBox::critical(qobject_cast<QWidget *>(parent()), QString("DLT Viewer For Adb"),
                                   QString("Cannot open the export file %1").arg(to->fileName()));
             return false;
         }
@@ -112,7 +112,7 @@ bool DltExporter::start()
              qDebug() << QString("ERROR - cannot open the export file %1").arg(to->fileName());
              }
             else
-            QMessageBox::critical(qobject_cast<QWidget *>(parent()), QString("DLT Viewer"),
+            QMessageBox::critical(qobject_cast<QWidget *>(parent()), QString("DLT Viewer For Adb"),
                                   QString("Cannot open the export file %1").arg(to->fileName()));
             return false;
         }
@@ -129,7 +129,7 @@ bool DltExporter::start()
              qDebug() << QString("ERROR - cannot open the export file %1").arg(to->fileName());
              }
             else
-            QMessageBox::critical(qobject_cast<QWidget *>(parent()), QString("DLT Viewer"),
+            QMessageBox::critical(qobject_cast<QWidget *>(parent()), QString("DLT Viewer For Adb"),
                                   QString("Cannot open the export file %1").arg(to->fileName()));
             return false;
         }
@@ -375,7 +375,7 @@ void DltExporter::exportMessages(QDltFile *from, QFile *to, QDltPluginManager *p
     QProgressDialog fileprogress("Export ...", "Cancel", 0, stoping, qobject_cast<QWidget *>(parent()));
     if (silentMode == true)
      {
-      fileprogress.setWindowTitle("DLT Viewer");
+      fileprogress.setWindowTitle("DLT Viewer For Adb");
       fileprogress.setWindowModality(Qt::WindowModal);
       fileprogress.show();
      }

@@ -9,7 +9,7 @@
 
 //! Manage all DLT Plugins
 /*!
-  This class loads all DLT Viewer Plugins and provides access to them.
+  This class loads all DLT Viewer For Adb Plugins and provides access to them.
 */
 
 class QDltPlugin;
@@ -40,7 +40,7 @@ public:
       The three directories:
       - ./plugin
       - settingsPluginPath
-      - /usr/share/dlt-viewer/plugins
+      - /usr/share/dlt-viewer-for-adb/plugins
       \param settingsPluginPath Full path name.
     */
     QStringList loadPlugins(const QString &settingsPluginPath);

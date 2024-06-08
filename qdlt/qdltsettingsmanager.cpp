@@ -60,14 +60,14 @@ void QDltSettingsManager::close()
 QDltSettingsManager::QDltSettingsManager()
 {
     /* check if directory for configuration exists */
-    QDir dir(QDir::homePath()+"/.dlt/config");
+    QDir dir(QDir::homePath()+"/.dlta/config");
     if(!dir.exists())
     {
         /* directory does not exist, make it */
         if(!dir.mkpath(dir.absolutePath()))
         {
             /* creation of directory fails */
-            QMessageBox::critical(0, QString("DLT Viewer"),
+            QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                                            QString("Cannot create directory to store configuration!\n\n")+dir.absolutePath(),
                                            QMessageBox::Ok,
                                            QMessageBox::Ok);
@@ -420,7 +420,7 @@ void QDltSettingsManager::readSettings()
     pluginsPath = settings->value("startup/pluginsPath",0).toInt();
     pluginsPathName = settings->value("startup/pluginsPathName",QString("")).toString();
     defaultFilterPath = settings->value("startup/defaultFilterPath",1).toInt();
-    defaultFilterPathName = settings->value("startup/defaultFilterPathName",QDir::homePath()+"/.dlt/filters").toString();
+    defaultFilterPathName = settings->value("startup/defaultFilterPathName",QDir::homePath()+"/.dlta/filters").toString();
     pluginsAutoloadPath = settings->value("startup/pluginsAutoloadPath",0).toInt();
     pluginsAutoloadPathName = settings->value("startup/pluginsAutoloadPathName",QString("")).toString();
     filterCache = settings->value("startup/filterCache",1).toInt();

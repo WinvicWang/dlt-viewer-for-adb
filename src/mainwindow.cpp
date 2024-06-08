@@ -150,7 +150,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionSort_By_Timestamp->setChecked(ui->checkBoxSortByTimestamp->isChecked());
     ui->actionProject->setChecked(ui->dockWidgetContents->isVisible());
     ui->actionSearch_Results->setChecked(ui->dockWidgetSearchIndex->isVisible());
-    ui->actionFullLog->setChecked(ui->dockWidgetFullLog->isFullScreen());
+    ui->actionFullLog->setChecked(ui->dockWidgetFullLog->isVisible());
 
     newCompleter = new QCompleter(&m_CompleterModel,this);
 
@@ -242,7 +242,7 @@ MainWindow::~MainWindow()
         QString newFilename = info.baseName()+
                 (startLoggingDateTime.toString("__yyyyMMdd_hhmmss"))+
                 (QDateTime::currentDateTime().toString("__yyyyMMdd_hhmmss"))+
-                QString(".dlt");
+                QString(".dlta");
         QFileInfo infoNew(info.absolutePath(),newFilename);
 
         // rename old file
@@ -436,7 +436,7 @@ void MainWindow::initView()
     QFileSystemModel *model = new QFileSystemModel;
 
     model->setNameFilterDisables(false);
-    model->setNameFilters(QStringList() << "*.dlt" << "*.dlf" << "*.dlp");
+    model->setNameFilters(QStringList() << "*.dlta" << "*.dlf" << "*.dlp");
     model->setRootPath(QDir::rootPath());
 
     /* sort dir entries */
@@ -702,7 +702,7 @@ void MainWindow::initFileHandling()
     else
     {
         /* Load default project file */
-        this->setWindowTitle(QString("DLT Viewer For ADB - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
+        this->setWindowTitle(QString("DLT Viewer For Adb For ADB - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
         if(settings->defaultProjectFile)
         {
             qDebug() << QString("Loading default project %1").arg(settings->defaultProjectFileName);
@@ -714,7 +714,7 @@ void MainWindow::initFileHandling()
               }
              else
               {
-               QMessageBox::critical(0, QString("DLT Viewer"), QString("Cannot load default project \"%1\"").arg(settings->defaultProjectFileName));
+               QMessageBox::critical(0, QString("DLT Viewer For Adb"), QString("Cannot load default project \"%1\"").arg(settings->defaultProjectFileName));
               }
 
             }
@@ -767,7 +767,7 @@ void MainWindow::initFileHandling()
                 }
                else
                 {
-                 QMessageBox::critical(0, QString("DLT Viewer"), QString("Cannot load temporary log file \"%1\"\n%2").arg(outputfile.fileName()).arg(outputfile.errorString()));
+                 QMessageBox::critical(0, QString("DLT Viewer For Adb"), QString("Cannot load temporary log file \"%1\"\n%2").arg(outputfile.fileName()).arg(outputfile.errorString()));
                 }
              } // isConvert false
          }
@@ -791,7 +791,7 @@ void MainWindow::initFileHandling()
             }
            else
             {
-            QMessageBox::critical(0, QString("DLT Viewer"),QString("Loading DLT Filter file failed!"));
+            QMessageBox::critical(0, QString("DLT Viewer For Adb"),QString("Loading DLT Filter file failed!"));
             }
         }
     }
@@ -981,7 +981,7 @@ void MainWindow::deleteactualFile()
           }
         else
          {
-            QMessageBox::critical(0, QString("DLT Viewer"),
+            QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                                   QString("Can not delete temporary log file \"%1\"\n%2")
                                   .arg(outputfile.fileName())
                                   .arg(outputfile.errorString()));
@@ -1009,7 +1009,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     else if(outputfileIsTemporary && !outputfileIsFromCLI)
     {
-        if(QMessageBox::information(this, "DLT Viewer",
+        if(QMessageBox::information(this, "DLT Viewer For Adb",
            "You still have an unsaved temporary file open. Exit anyway?",
            QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
         {
@@ -1033,7 +1033,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::on_action_menuFile_New_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-        tr("New DLT Log file"), workingDirectory.getDltDirectory(), tr("DLT Files (*.dlt);;All files (*.*)"));
+        tr("New DLT Log file"), workingDirectory.getDltDirectory(), tr("DLT Files (*.dlta);;All files (*.*)"));
 
     if(fileName.isEmpty())
     {
@@ -1083,7 +1083,7 @@ void MainWindow::onNewTriggered(QString fileName)
          }
          else
          {
-          QMessageBox::critical(0, QString("DLT Viewer"),
+          QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                                QString("Cannot create new log file \"%1\"\n%2")
                                .arg(fileName)
                                .arg(outputfile.errorString()));
@@ -1096,7 +1096,7 @@ void MainWindow::onNewTriggered(QString fileName)
 void MainWindow::on_action_menuFile_Open_triggered()
 {
     QStringList fileNames = QFileDialog::getOpenFileNames(this,
-        tr("Open one or more DLT Log files"), workingDirectory.getDltDirectory(), tr("DLT Files (*.dlt);;ADB Log Files (*.txt);;All files (*.*)"));
+        tr("Open one or more DLT Log files"), workingDirectory.getDltDirectory(), tr("DLT Files (*.dlta);;ADB Log Files (*.txt);;All files (*.*)"));
 
     if(fileNames.isEmpty())
         return;
@@ -1236,7 +1236,7 @@ bool MainWindow::openDltFile(QStringList fileNames)
               }
             else
               {
-                QMessageBox::critical(0, QString("DLT Viewer"), QString("Cannot open log file \"%1\"\n%2").arg(fileNames.last()).arg(outputfile.errorString()));
+                QMessageBox::critical(0, QString("DLT Viewer For Adb"), QString("Cannot open log file \"%1\"\n%2").arg(fileNames.last()).arg(outputfile.errorString()));
               }
             ret = false;
         }
@@ -1458,7 +1458,7 @@ void MainWindow::on_action_menuFile_Import_DLT_Stream_with_Serial_Header_trigger
 void MainWindow::on_action_menuFile_Append_DLT_File_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Append DLT File"), workingDirectory.getDltDirectory(), tr("DLT File (*.dlt)"));
+        tr("Append DLT File"), workingDirectory.getDltDirectory(), tr("DLT File (*.dlta)"));
 
     if(fileName.isEmpty())
         return;
@@ -1580,7 +1580,7 @@ void MainWindow::on_actionExport_triggered()
         qDebug() << "DLT Export of all" << qfile.size() << "messages";
         if(qfile.size() <= 0)
         {
-            QMessageBox::critical(this, QString("DLT Viewer"),
+            QMessageBox::critical(this, QString("DLT Viewer For Adb"),
                                   QString("Nothing to export. Make sure you have a DLT file open."));
             return;
         }
@@ -1590,7 +1590,7 @@ void MainWindow::on_actionExport_triggered()
         qDebug() << "DLT Export of filterd" << qfile.sizeFilter() << "messages";
         if(qfile.sizeFilter() <= 0)
         {
-            QMessageBox::critical(this, QString("DLT Viewer"),
+            QMessageBox::critical(this, QString("DLT Viewer For Adb"),
                                   QString("Nothing to export. Make sure you have a DLT file open and that not everything is filtered."));
             return;
         }
@@ -1600,7 +1600,7 @@ void MainWindow::on_actionExport_triggered()
         qDebug() << "DLT Export of selected" << list.count() << "messages";
         if(list.count() <= 0)
         {
-            QMessageBox::critical(this, QString("DLT Viewer"),
+            QMessageBox::critical(this, QString("DLT Viewer For Adb"),
                                   QString("No messages selected. Select something from the main view."));
             return;
         }
@@ -1612,7 +1612,7 @@ void MainWindow::on_actionExport_triggered()
 
     if((exportFormat == DltExporter::FormatDlt)||(exportFormat == DltExporter::FormatDltDecoded))
     {
-        filters << "DLT Files (*.dlt)" <<"All files (*.*)";
+        filters << "DLT Files (*.dlta)" <<"All files (*.*)";
         dialog.setDefaultSuffix("dlt");
         dialog.setWindowTitle("Export to DLT file");
         qDebug() << "DLT Export to Dlt";
@@ -1681,7 +1681,7 @@ void MainWindow::on_action_menuFile_SaveAs_triggered()
 
     QFileDialog dialog(this);
     QStringList filters;
-    filters << "DLT Files (*.dlt)" <<"All files (*.*)";
+    filters << "DLT Files (*.dlta)" <<"All files (*.*)";
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("dlt");
     dialog.setDirectory(workingDirectory.getDltDirectory());
@@ -1710,7 +1710,7 @@ void MainWindow::onSaveAsTriggered(QString fileName)
     /* check if filename is the same as already open */
     if(outputfile.fileName()==fileName)
     {
-        QMessageBox::critical(0, QString("DLT Viewer"),
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                               QString("File is already open:\n")+fileName);
         return;
     }
@@ -1719,7 +1719,7 @@ void MainWindow::onSaveAsTriggered(QString fileName)
     QFileInfo fileinfo(QFileInfo(fileName).absolutePath());
     if(!fileinfo.isDir() || !fileinfo.isWritable())
     {
-        QMessageBox::critical(0, QString("DLT Viewer"),
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                               QString("Cannot write new file:\n")+fileName);
         return;
     }
@@ -1739,7 +1739,7 @@ void MainWindow::onSaveAsTriggered(QString fileName)
     {
         if(!destFile.remove())
         {
-            QMessageBox::critical(0, QString("DLT Viewer"),
+            QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                                   QString("Save as failed! Could not delete old file."));
             return;
         }
@@ -1748,7 +1748,7 @@ void MainWindow::onSaveAsTriggered(QString fileName)
 
     if(!sourceFile.copy(destFile.fileName()))
     {
-        QMessageBox::critical(0, QString("DLT Viewer"),
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                               QString("Save as failed! Could not move to new destination."));
         return;
     }
@@ -1764,7 +1764,7 @@ void MainWindow::onSaveAsTriggered(QString fileName)
         reloadLogFile();
     }
     else
-        QMessageBox::critical(0, QString("DLT Viewer"),
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                               QString("Cannot rename log file \"%1\"\n%2")
                               .arg(fileName)
                               .arg(outputfile.errorString()));
@@ -1827,7 +1827,7 @@ void MainWindow::on_action_menuFile_Clear_triggered()
     }
     else
     {
-        QMessageBox::critical(0, QString("DLT Viewer"),
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                               QString("Cannot open log file \"%1\"\n%2")
                               .arg(fn)
                               .arg(outputfile.errorString()));
@@ -1838,7 +1838,7 @@ void MainWindow::on_action_menuFile_Clear_triggered()
         QFile dfile(oldfn);
         if(!dfile.remove())
         {
-            QMessageBox::critical(0, QString("DLT Viewer"),
+            QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                                   QString("Cannot delete log file \"%1\"\n%2")
                                   .arg(oldfn)
                                   .arg(dfile.errorString()));
@@ -2314,7 +2314,7 @@ void MainWindow::on_action_menuFile_Settings_triggered()
                 if ( true == QDltOptManager::getInstance()->issilentMode() ) // inverse logic !!
                   qDebug() << "Logging only mode disabled! Please reload DLT file to view file!)";
                 else
-                  QMessageBox::information(0, QString("DLT Viewer"), QString("Logging only mode disabled! Please reload DLT file to view file!"));
+                  QMessageBox::information(0, QString("DLT Viewer For Adb"), QString("Logging only mode disabled! Please reload DLT file to view file!"));
             }
            */
         }
@@ -2357,7 +2357,7 @@ void MainWindow::on_action_menuProject_New_triggered()
 
     /* create new project */
 
-    this->setWindowTitle(QString("DLT Viewer For ADB - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
+    this->setWindowTitle(QString("DLT Viewer For Adb For ADB - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
     project.Clear();
 
     /* Update the ECU list in control plugins */
@@ -2412,14 +2412,14 @@ bool MainWindow::openDlfFile(QString fileName,bool replace)
     }
     else
     {
-        QMessageBox::critical(0, QString("DLT Viewer"),QString("Loading DLT Filter file failed!"));
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),QString("Loading DLT Filter file failed!"));
     }
     return true;
 }
 
 bool MainWindow::openDlpFile(QString fileName)
 {
-    /* stop first all ECU connections, so that DLT Viewer will not crash */
+    /* stop first all ECU connections, so that DLT Viewer For Adb will not crash */
     disconnectAll();
 
     /* Open existing project */
@@ -2431,7 +2431,7 @@ bool MainWindow::openDlpFile(QString fileName)
         /* change Project file working directory */
         workingDirectory.setDlpDirectory(QFileInfo(fileName).absolutePath());
 
-        this->setWindowTitle(QString("DLT Viewer - "+fileName+" - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
+        this->setWindowTitle(QString("DLT Viewer For Adb - "+fileName+" - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
 
         /* Load the plugins description files after loading project */
         updatePlugins();
@@ -2494,7 +2494,7 @@ void MainWindow::on_action_menuProject_Save_triggered()
         /* change Project file working directory */
         workingDirectory.setDlpDirectory(QFileInfo(fileName).absolutePath());
 
-        this->setWindowTitle(QString("DLT Viewer - "+fileName+" - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
+        this->setWindowTitle(QString("DLT Viewer For Adb - "+fileName+" - Version : %1 %2").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE));
 
         setCurrentProject(fileName);
     }
@@ -3449,7 +3449,7 @@ void MainWindow::on_action_menuConfig_Connect_triggered()
         connectECU(ecuitem);
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No ECU selected in configuration!"));
 
 }
@@ -3464,7 +3464,7 @@ void MainWindow::on_action_menuConfig_Disconnect_triggered()
         disconnectECU(ecuitem);
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No ECU selected in configuration!"));
 }
 
@@ -4302,7 +4302,7 @@ void MainWindow::createsplitfile()
     QString newFilename = info.baseName()+
             (startLoggingDateTime.toString("__yyyyMMdd_hhmmss"))+
             (QDateTime::currentDateTime().toString("__yyyyMMdd_hhmmss"))+
-            QString(".dlt");
+            QString(".dlta");
     QFileInfo infoNew(info.absolutePath(),newFilename);
     qDebug() << "Split to" <<  outputfile.fileName() << "to" << infoNew.absoluteFilePath();
 
@@ -4357,7 +4357,7 @@ void MainWindow::SplitTriggered(QString fileName)
          }
          else
          {
-         QMessageBox::critical(0, QString("DLT Viewer"),
+         QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                                   QString("Cannot create new log file \"%1\"\n%2")
                                   .arg(fileName)
                                   .arg(outputfile.errorString()));
@@ -4963,7 +4963,7 @@ void MainWindow::on_action_menuDLT_Get_Default_Log_Level_triggered()
         ControlServiceRequest(ecuitem,DLT_SERVICE_ID_GET_DEFAULT_LOG_LEVEL);
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No ECU selected in configuration!"));
 }
 
@@ -4984,7 +4984,7 @@ void MainWindow::on_action_menuDLT_Set_Default_Log_Level_triggered()
         ecuitem->update();
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No ECU selected in configuration!"));
 }
 
@@ -5027,7 +5027,7 @@ void MainWindow::on_action_menuDLT_Set_Log_Level_triggered()
         }
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No Context selected in configuration!"));
 }
 
@@ -5061,7 +5061,7 @@ void MainWindow::on_action_menuDLT_Set_All_Log_Levels_triggered()
         }
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No ECU selected in configuration!"));
 }
 
@@ -5075,7 +5075,7 @@ void MainWindow::on_action_menuDLT_Get_Log_Info_triggered()
         controlMessage_GetLogInfo(ecuitem);
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No ECU selected in configuration!"));
 }
 
@@ -5415,7 +5415,7 @@ void MainWindow::on_action_menuDLT_Store_Config_triggered()
         ControlServiceRequest(ecuitem,DLT_SERVICE_ID_STORE_CONFIG);
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No ECU selected in configuration!"));
 }
 
@@ -5430,7 +5430,7 @@ void MainWindow::on_action_menuDLT_Reset_to_Factory_Default_triggered()
         ControlServiceRequest(ecuitem,DLT_SERVICE_ID_RESET_TO_FACTORY_DEFAULT);
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No ECU selected in configuration!"));
 }
 
@@ -5445,7 +5445,7 @@ void MainWindow::on_action_menuDLT_Get_Software_Version_triggered()
         ControlServiceRequest(ecuitem,DLT_SERVICE_ID_GET_SOFTWARE_VERSION);
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No ECU selected in configuration!"));
 }
 
@@ -5460,7 +5460,7 @@ void MainWindow::on_action_menuDLT_Get_Local_Time_2_triggered()
         ControlServiceRequest(ecuitem,DLT_SERVICE_ID_GET_LOCAL_TIME);
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No ECU selected in configuration!"));
 }
 
@@ -5581,7 +5581,7 @@ void MainWindow::on_action_menuDLT_Send_Injection_triggered()
 
     if(!ecuitem)
     {
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("Nothing selected in configuration!"));
         return;
     }
@@ -5624,7 +5624,7 @@ void MainWindow::on_action_menuDLT_Send_Injection_triggered()
         }
     }
     //else
-    //    QMessageBox::warning(0, QString("DLT Viewer"),
+    //    QMessageBox::warning(0, QString("DLT Viewer For Adb"),
     //                         QString("No ECU selected in configuration!"));
 }
 
@@ -5789,7 +5789,7 @@ void MainWindow::on_action_menuHelp_Support_triggered()
 
 void MainWindow::on_action_menuHelp_Info_triggered()
 {
-    QMessageBox::information(0, QString("DLT Viewer"),
+    QMessageBox::information(0, QString("DLT Viewer For Adb"),
                              QString("Package Version : %1 %2\n").arg(PACKAGE_VERSION).arg(PACKAGE_VERSION_STATE)+
                              QString("Package Revision: %1\n\n").arg(PACKAGE_REVISION)+
                              QString("Build Date: %1\n").arg(__DATE__)+
@@ -5821,12 +5821,12 @@ void MainWindow::on_action_menuHelp_Command_Line_triggered()
 {
     // Please copy changes to QDltOptManager::getInstance().cpp - printUsage()
 
-    QMessageBox::information(0, QString("DLT Viewer - Command line usage\t\t\t\t\t"), // tabs used to expand mesage box !
+    QMessageBox::information(0, QString("DLT Viewer For Adb - Command line usage\t\t\t\t\t"), // tabs used to expand mesage box !
                          #ifdef WIN32
-                             QString("Usage: dlt-viewer.exe [OPTIONS]\n\n")+
+                             QString("Usage: dlt-viewer-for-adb.exe [OPTIONS]\n\n")+
                              QString("Options:\n")+
                          #else
-                             QString("Usage: dlt-viewer [OPTIONS]\n\n")+
+                             QString("Usage: dlt-viewer-for-adb [OPTIONS]\n\n")+
                              QString("Options:\n")+
                          #endif
                              QString(" -h \t\tPrint usage\n")+
@@ -5834,8 +5834,8 @@ void MainWindow::on_action_menuHelp_Command_Line_triggered()
                              QString("\n")+
                              QString(" -p <projectfile> \tLoading project (*.dlp) file on startup\n")+
                              QString(" -f <filterfile> \t\tLoading filterfile on startup (must end with \".dlf\")\n")+
-                             QString(" -l <logfile> \t\tLoading (*.dlt) logfile on startup\n")+
-                             QString(" -c <logfile> <textfile> \tConvert (*.dlt) logfile to ASCII textfile\n")+
+                             QString(" -l <logfile> \t\tLoading (*.dlta) logfile on startup\n")+
+                             QString(" -c <logfile> <textfile> \tConvert (*.dlta) logfile to ASCII textfile\n")+
                              QString(" -u \t\t\tExport logfile to UTF8 instead\n")+
                              QString(" -csv \t\t\tExport logfile to csv ( Excel ) instead\n")+
                              QString(" -d \t\t\tExport logfile to DLT format\n")+
@@ -6335,7 +6335,7 @@ void MainWindow::on_action_menuSearch_Find_triggered()
 
 void MainWindow::loadPlugins()
 {
-    /* load plugins from subdirectory plugins, from directory if set in settings and from /usr/share/dlt-viewer/plugins in Linux */
+    /* load plugins from subdirectory plugins, from directory if set in settings and from /usr/share/dlt-viewer-for-adb/plugins in Linux */
     QStringList errList;
     if(settings->pluginsPath)
     {
@@ -6351,7 +6351,7 @@ void MainWindow::loadPlugins()
         // We have some error messages from the plugin manager
         QStringList::const_iterator iter;
         for(iter = errList.constBegin(); iter != errList.constEnd(); ++iter)
-            QMessageBox::warning(0, QString("DLT Viewer"), (*iter).toLocal8Bit().constData());
+            QMessageBox::warning(0, QString("DLT Viewer For Adb"), (*iter).toLocal8Bit().constData());
     }
 
     // Initialize Plugin Prio
@@ -6652,7 +6652,7 @@ void MainWindow::on_action_menuPlugin_Edit_triggered() {
     }
     else
     {
-        ErrorMessage(QMessageBox::Warning,QString("DLT Viewer"),QString("No Plugin selected!"));
+        ErrorMessage(QMessageBox::Warning,QString("DLT Viewer For Adb"),QString("No Plugin selected!"));
     }
 
 }
@@ -6675,11 +6675,11 @@ void MainWindow::on_action_menuPlugin_Show_triggered() {
                 applyConfigEnabled(true);
             }
         }else{
-             ErrorMessage(QMessageBox::Warning,QString("DLT Viewer"),QString("The selected Plugin is already active."));
+             ErrorMessage(QMessageBox::Warning,QString("DLT Viewer For Adb"),QString("The selected Plugin is already active."));
         }
     }
     else {
-        ErrorMessage(QMessageBox::Warning,QString("DLT Viewer"),QString("No Plugin selected!"));
+        ErrorMessage(QMessageBox::Warning,QString("DLT Viewer For Adb"),QString("No Plugin selected!"));
     }
 
 }
@@ -6695,14 +6695,14 @@ void MainWindow::on_action_menuPlugin_Hide_triggered() {
             item->savePluginModeToSettings();
             updatePlugin(item);
         }else{
-            ErrorMessage(QMessageBox::Warning,QString("DLT Viewer"),QString("No Plugin selected!"));
+            ErrorMessage(QMessageBox::Warning,QString("DLT Viewer For Adb"),QString("No Plugin selected!"));
 
-            QMessageBox::warning(0, QString("DLT Viewer"),
+            QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                                  QString("The selected Plugin is already hidden or deactivated."));
         }
     }
     else {
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No Plugin selected!"));
     }
 
@@ -6721,13 +6721,13 @@ void MainWindow::action_menuPlugin_Enable_triggered()
             updatePlugin(item);
             applyConfigEnabled(true);
         }else{
-            QMessageBox::warning(0, QString("DLT Viewer"),
+            QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                                  QString("The selected Plugin is already deactivated."));
         }
     }
     else
     {
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No Plugin selected!"));
     }
 
@@ -6755,12 +6755,12 @@ void MainWindow::on_action_menuPlugin_Disable_triggered()
             updatePlugin(item);
             applyConfigEnabled(true);
         }else{
-            QMessageBox::warning(0, QString("DLT Viewer"),
+            QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                                  QString("The selected Plugin is already deactivated."));
         }
     }
     else
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No Plugin selected!"));
 }
 
@@ -6774,7 +6774,7 @@ void MainWindow::filterIndexStart()
 
     if(list.count()<=0)
     {
-        QMessageBox::critical(0, QString("DLT Viewer"),
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                               QString("No message selected"));
         return;
     }
@@ -6798,7 +6798,7 @@ void MainWindow::filterIndexEnd()
 
     if(list.count()<=0)
     {
-        QMessageBox::critical(0, QString("DLT Viewer"),
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                               QString("No message selected"));
         return;
     }
@@ -6824,7 +6824,7 @@ void MainWindow::filterAddTable() {
 
     if(list.count()<=0)
     {
-        QMessageBox::critical(0, QString("DLT Viewer"),
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                               QString("No message selected"));
         return;
     }
@@ -6928,7 +6928,7 @@ void MainWindow::on_action_menuFilter_Save_As_triggered()
     {
         workingDirectory.setDlfDirectory(QFileInfo(fileName).absolutePath());
         if(!project.SaveFilter(fileName))
-            QMessageBox::critical(0, QString("DLT Viewer"),QString("Save DLT Filter file failed!"));
+            QMessageBox::critical(0, QString("DLT Viewer For Adb"),QString("Save DLT Filter file failed!"));
         setCurrentFilters(fileName);
     }
 }
@@ -7086,7 +7086,7 @@ void MainWindow::on_action_menuFilter_Duplicate_triggered() {
         }
     }
     else {
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No Filter selected!"));
     }
 }
@@ -7116,7 +7116,7 @@ void MainWindow::on_action_menuFilter_Edit_triggered()
         }
     }
     else {
-        QMessageBox::warning(0, QString("DLT Viewer"),
+        QMessageBox::warning(0, QString("DLT Viewer For Adb"),
                              QString("No Filter selected!"));
     }
 }
@@ -7378,7 +7378,7 @@ void MainWindow::on_exploreView_customContextMenuRequested(QPoint pos)
                    {
                        QString path = getPathFromExplorerViewIndexModel(index);
 
-                       if (path.toLower().endsWith(".dlt"))
+                       if (path.toLower().endsWith(".dlta"))
                        {
                            pathsList.append(path);
                        }
@@ -7401,7 +7401,7 @@ void MainWindow::on_exploreView_customContextMenuRequested(QPoint pos)
 
             if ((!path.toLower().endsWith(".dlp")) && (5 > indexes.size()))
             {
-                if ((path.toLower().endsWith(".dlt")))
+                if ((path.toLower().endsWith(".dlta")))
                 {
                     action = new QAction("&Open in new instance", this);
                     connect(action, &QAction::triggered, this, [this, indexes](){
@@ -7422,7 +7422,7 @@ void MainWindow::on_exploreView_customContextMenuRequested(QPoint pos)
                 connect(action, &QAction::triggered, this, [this, indexes](){
                     auto index = indexes[0];
                     auto path  = getPathFromExplorerViewIndexModel(index);
-                    if (path.toLower().endsWith(".dlt"))
+                    if (path.toLower().endsWith(".dlta"))
                         appendDltFile(path);
                     else
                         openDlfFile(path,false);
@@ -7438,7 +7438,7 @@ void MainWindow::on_exploreView_customContextMenuRequested(QPoint pos)
                 auto path  = getPathFromExplorerViewIndexModel(index);
 
                 QStringList  files;
-                QDirIterator it_sh(path, QStringList() << "*.dlt", QDir::Files, QDirIterator::Subdirectories);
+                QDirIterator it_sh(path, QStringList() << "*.dlta", QDir::Files, QDirIterator::Subdirectories);
 
                 while (it_sh.hasNext())
                 {
@@ -7682,7 +7682,7 @@ void MainWindow::dropEvent(QDropEvent *event)
             QUrl url = event->mimeData()->urls()[num];
             filename = url.toLocalFile();
 
-            if(filename.endsWith(".dlt", Qt::CaseInsensitive))
+            if(filename.endsWith(".dlta", Qt::CaseInsensitive))
             {
                 filenames.append(filename);
                 workingDirectory.setDltDirectory(QFileInfo(filename).absolutePath());
@@ -7724,7 +7724,7 @@ void MainWindow::dropEvent(QDropEvent *event)
                 if(list.size()!=1)
                 {
 
-                item = QInputDialog::getItem(this, tr("DLT Viewer"),
+                item = QInputDialog::getItem(this, tr("DLT Viewer For Adb"),
                                                          tr("Select Plugin to load configuration:"), items, 0, false, &ok);
                 }
                 else
@@ -8389,7 +8389,7 @@ void MainWindow::on_actionDefault_Filter_Reload_triggered()
         if(!dir.mkpath(dir.absolutePath()))
         {
             /* creation of directory fails */
-            QMessageBox::critical(0, QString("DLT Viewer"),
+            QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                                            QString("Cannot create directory to store cache files!\n\n")+dir.absolutePath(),
                                            QMessageBox::Ok,
                                            QMessageBox::Ok);
@@ -8536,7 +8536,7 @@ void MainWindow::indexStart()
 
 void MainWindow::on_exploreView_activated(const QModelIndex &index)
 {
-    static const QStringList ext  = QStringList() << ".dlt" << ".dlf" << ".dlp";
+    static const QStringList ext  = QStringList() << ".dlta" << ".dlf" << ".dlp";
     QString                  path = getPathFromExplorerViewIndexModel(index);
 
     auto result = std::find_if(ext.begin(), ext.end(),

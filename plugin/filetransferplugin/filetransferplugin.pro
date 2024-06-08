@@ -1,4 +1,4 @@
-# include global settings for all DLT Viewer Plugins
+# include global settings for all DLT Viewer For Adb Plugins
 include( ../plugin.pri )
 
 greaterThan(QT_VER_MAJ, 4) {

@@ -10,7 +10,7 @@
 
 //! Access class to a DLT Plugin to decode, view and control DLT messages
 /*!
-  This class loads a DLT Viewer Plugin library and provides functions to access the plugin.
+  This class loads a DLT Viewer For Adb Plugin library and provides functions to access the plugin.
 */
 class QDLT_EXPORT QDltPlugin
 {

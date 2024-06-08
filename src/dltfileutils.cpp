@@ -29,7 +29,7 @@ QString DltFileUtils::createTempFile(QDir path,  bool silentmode)
     QString fn = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")
                .append("_")
                .append(QString::number(a))
-               .append("_dlt-viewer-tmpfile.dlt");
+               .append("_dlt-viewer-tmpfile.dlta");
     QFile file(path.absolutePath().append("/").append(fn));
     //qDebug() << "Create " << file.fileName() << a;
     if(file.exists())
@@ -40,7 +40,7 @@ QString DltFileUtils::createTempFile(QDir path,  bool silentmode)
 	    }
 		else
 		{
-        QMessageBox::critical(0, QString("DLT Viewer"),
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                           QString("Temporary file %1\nalready exists !")
                           .arg(file.fileName()));
         }
@@ -54,7 +54,7 @@ QString DltFileUtils::createTempFile(QDir path,  bool silentmode)
 	    }
 		else
 		{
-        QMessageBox::critical(0, QString("DLT Viewer"),
+        QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                           QString("Can not create temporary file !\n%1\n%2")
                           .arg(file.fileName()).arg(file.errorString()));
         }
@@ -88,7 +88,7 @@ QDir DltFileUtils::getTempPath(bool silentmode)
                             }
                            else
                             {
-                              QMessageBox::critical(0, QString("DLT Viewer"),
+                              QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                                                 QString("System temporary path\n %1\n not accessible !\nUsing \".\" instead !")
                                                 .arg(temp_path.absolutePath()));
                             }
@@ -110,7 +110,7 @@ QDir DltFileUtils::getTempPath(bool silentmode)
                }
               else
                {
-                QMessageBox::critical(0, QString("DLT Viewer"),
+                QMessageBox::critical(0, QString("DLT Viewer For Adb"),
                                   QString("Could not create temporary path !\n%1\nUsing \".\" instead !")
                                   .arg(temp_path.absolutePath()));
                }
