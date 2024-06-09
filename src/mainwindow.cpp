@@ -1280,7 +1280,8 @@ bool MainWindow::openADBLog(QString fileName)
     }
 
     QProgressDialog progress("Processing...", "Cancel", 0, 100);
-    progress.setWindowModality(Qt::WindowModal);
+    progress.setWindowModality(Qt::ApplicationModal);
+    progress.show();
 
     int parsedSize = 0;
     int totalSize = ecuitem.adbFile.size();
