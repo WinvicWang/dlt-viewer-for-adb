@@ -60,6 +60,16 @@ FilterDialog::FilterDialog(QWidget *parent) :
     font.setStyleHint(QFont::Monospace);
     ui->plainTextEdit_msgIdRule->setFont(font);
     on_checkboxMessageId_stateChanged(0);
+    ui->checkBoxMessageId->setVisible(false);
+    ui->label_msgIdMin->setVisible(false);
+    ui->lineEdit_msgIdMin->setVisible(false);
+    ui->label_msgIdMax->setVisible(false);
+    ui->lineEdit_msgIdMax->setVisible(false);
+    ui->plainTextEdit_msgIdRule->setVisible(false);
+    ui->checkBoxCtrlMsgs->setVisible(false);
+    ui->checkBoxRegexSearchReplace->setVisible(false);
+    ui->lineEditRegexSearch->setVisible(false);
+    ui->lineEditRegexReplace->setVisible(false);
 }
 
 FilterDialog::~FilterDialog()

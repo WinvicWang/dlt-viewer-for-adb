@@ -199,6 +199,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->action_menuPlugin_Show->setVisible(false);
     ui->action_menuPlugin_Hide->setVisible(false);
     ui->action_menuPlugin_Disable->setVisible(false);
+    ui->checkBoxAppendDefaultFilter->setVisible(false);
 }
 
 MainWindow::~MainWindow()
